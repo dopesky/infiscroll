@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/InfiniteLoop/tests" isTestSource="true" packagePrefix="Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/InfiniteLoop/app" isTestSource="false" packagePrefix="App\" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/asm89/stack-cors" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/dnoegel/php-xdg-base-dir" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/doctrine/inflector" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/doctrine/instantiator" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/doctrine/lexer" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/dragonmantank/cron-expression" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/egulias/email-validator" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/facade/flare-client-php" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/facade/ignition" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/facade/ignition-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/fideloper/proxy" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/filp/whoops" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/fruitcake/laravel-cors" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/fzaninotto/faker" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/guzzlehttp/guzzle" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/guzzlehttp/promises" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/guzzlehttp/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/hamcrest/hamcrest-php" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/laravel/framework" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/laravel/tinker" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/league/commonmark" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/league/flysystem" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/mockery/mockery" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/monolog/monolog" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/myclabs/deep-copy" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/nesbot/carbon" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/nikic/php-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/nunomaduro/collision" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/opis/closure" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phar-io/manifest" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phar-io/version" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpdocumentor/reflection-common" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpdocumentor/reflection-docblock" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpdocumentor/type-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpoption/phpoption" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpspec/prophecy" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpunit/php-code-coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpunit/php-file-iterator" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpunit/php-text-template" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpunit/php-timer" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpunit/php-token-stream" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/phpunit/phpunit" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/psy/psysh" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/ralouphie/getallheaders" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/ramsey/collection" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/ramsey/uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/scrivo/highlight.php" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/code-unit-reverse-lookup" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/comparator" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/diff" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/environment" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/exporter" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/global-state" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/object-enumerator" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/object-reflector" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/recursion-context" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/resource-operations" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/type" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/sebastian/version" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/swiftmailer/swiftmailer" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/css-selector" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/error-handler" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/http-foundation" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/http-kernel" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/mime" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/polyfill-iconv" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/polyfill-intl-idn" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/polyfill-php72" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/polyfill-php73" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/process" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/routing" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/translation" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/translation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/symfony/var-dumper" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/theseer/tokenizer" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/tijsverkoyen/css-to-inline-styles" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/vlucas/phpdotenv" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/voku/portable-ascii" />
+      <excludeFolder url="file://$MODULE_DIR$/InfiniteLoop/vendor/webmozart/assert" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="@types/bootstrap" level="application" />
+    <orderEntry type="library" name="@types/datatables.net" level="application" />
+    <orderEntry type="library" name="@types/jquery" level="application" />
+    <orderEntry type="library" name="all" level="application" />
+    <orderEntry type="library" name="moment" level="application" />
+    <orderEntry type="library" name="@types/gulp" level="application" />
+    <orderEntry type="library" name="@types/gulp-minify" level="application" />
+    <orderEntry type="library" name="@types/gulp-sass" level="application" />
+    <orderEntry type="library" name="@types/gulp-rename" level="application" />
+    <orderEntry type="library" name="@types/gulp-clean-dest" level="application" />
+    <orderEntry type="library" name="@types/gulp-connect" level="application" />
+    <orderEntry type="library" name="@types/browser-sync" level="application" />
+    <orderEntry type="library" name="@types/datatables.net-autofill" level="application" />
+    <orderEntry type="library" name="@types/datatables.net-buttons" level="application" />
+    <orderEntry type="library" name="@types/mocha" level="application" />
+    <orderEntry type="library" name="@types/chai" level="application" />
+    <orderEntry type="library" name="@types/chai" level="application" />
+    <orderEntry type="library" name="@types/chai" level="application" />
+  </component>
+</module>

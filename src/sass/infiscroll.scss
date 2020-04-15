@@ -1,0 +1,298 @@
+$scroll-bar-width-height: 5px;
+$scroll-bar-box-shadow: inset 0 0 15px slategrey;
+$scroll-bar-border-radius: 50rem;
+$scroll-bar-background: rgb(156, 39, 176);
+
+$show-on-scroll-reset-transform: translate(0, 0) rotate(0deg) scale(1);
+
+$lazy-load-background-initial-image: url('https://res.cloudinary.com/dkgtd3pil/image/upload/v1586261380/other_data/loading.svg');
+
+$rose: #e91e63;
+
+$purple: #9c27b0;
+
+%show-on-scroll-transform {
+  will-change: transform, opacity;
+  transform: translate(0, 50px) rotate(10deg) scale(0.5);
+  transition: transform .5s .25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity .3s .25s ease-out;
+}
+
+@mixin defineBgAndTextColors($name, $color, $color-on-bg: whitesmoke) {
+  .bg-#{$name} {
+    background: $color;
+    color: $color-on-bg;
+  }
+
+  a.bg-#{$name}, button.bg-#{$name} {
+    border-color: $color;
+
+    &:hover {
+      background: darken($color, 10%);
+      border-color: darken($color, 10%);
+      color: lighten($color-on-bg, 10%);
+    }
+  }
+
+  .text-#{$name} {
+    color: darken($color, 10%);
+  }
+
+  a.text-#{$name}, button.text-#{$name} {
+    &:hover {
+      color: darken($color, 20%);
+    }
+  }
+}
+
+@mixin defineTheadColors($name, $bg-color, $color) {
+  thead.thead-#{$name} {
+    background: $bg-color;
+    color: $color;
+
+    tr {
+      th {
+        border: none;
+      }
+    }
+  }
+}
+
+@mixin defineBreakPointStyles($class, $ext) {
+  .#{$class}-#{$ext} {
+    @content;
+  }
+  @media (min-width: 576px) {
+    .#{$class}-sm-#{$ext} {
+      @content;
+    }
+  }
+  @media (min-width: 768px) {
+    .#{$class}-md-#{$ext} {
+      @content;
+    }
+  }
+  @media (min-width: 992px) {
+    .#{$class}-lg-#{$ext} {
+      @content;
+    }
+  }
+  @media (min-width: 1200px) {
+    .#{$class}-xl-#{$ext} {
+      @content;
+    }
+  }
+}
+
+@include defineBgAndTextColors(rose, $rose);
+
+@include defineBgAndTextColors(purple, $purple);
+
+@include defineTheadColors(rose, $rose, whitesmoke);
+
+@include defineTheadColors(purple, $purple, whitesmoke);
+
+@include defineBreakPointStyles(font, xs) {
+  font-size: x-small
+}
+
+@include defineBreakPointStyles(font, sm) {
+  font-size: small
+}
+
+@include defineBreakPointStyles(font, md) {
+  font-size: medium
+}
+
+@include defineBreakPointStyles(font, lg) {
+  font-size: large
+}
+
+@include defineBreakPointStyles(font, xl) {
+  font-size: x-large
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  60% {
+    opacity: 0.6;
+    transform: translateX(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+
+}
+
+:root {
+  --rose: #{$rose};
+  --purple: #{$purple};
+}
+
+#site-info {
+  display: inline-block;
+  position: fixed;
+  top: 5%;
+  right: 5%;
+  z-index: 9999;
+  @media all and (max-width: 320px) {
+    width: 320px;
+    top: 0;
+    left: 0;
+
+    .toast {
+      max-width: 320px;
+      word-wrap: break-word;
+      word-break: break-all;
+    }
+  }
+}
+
+.hide-scroll {
+  overflow-y: hidden;
+
+  &:hover, &:focus, &:active {
+    overflow-y: auto;
+  }
+
+  &::-webkit-scrollbar {
+    background: rgba($scroll-bar-background, 0.4);
+    width: $scroll-bar-width-height;
+    height: $scroll-bar-width-height;
+    border-radius: $scroll-bar-border-radius;
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: $scroll-bar-box-shadow;
+    border-radius: $scroll-bar-border-radius;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $scroll-bar-background;
+    border-radius: $scroll-bar-border-radius;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: darken($scroll-bar-background, 10%);
+  }
+}
+
+.ellipses {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.carousel {
+  touch-action: manipulation;
+}
+
+.show-on-scroll {
+  @extend %show-on-scroll-transform;
+  opacity: 0;
+
+  &.is-visible {
+    opacity: 1;
+    transform: $show-on-scroll-reset-transform;
+  }
+}
+
+.background-image {
+  background-image: $lazy-load-background-initial-image;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
+  background-position: center !important;
+  background-size: cover !important;
+}
+
+#show-more {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 3%;
+  width: 100%;
+  z-index: 9998;
+}
+
+button, a, input, #show-more * {
+  &:focus {
+    box-shadow: none !important;
+    outline: none !important;
+  }
+}
+
+.img-xs {
+  width: 30px;
+  height: 30px;
+}
+
+.img-sm {
+  width: 60px;
+  height: 60px;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.pointer {
+  cursor: pointer !important;
+}
+
+.dataTables_processing {
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+  z-index: 100;
+}
+
+.dataTables-pagination-list-item {
+  a {
+    height: 40px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: slategrey;
+    padding-left: 0.63rem;
+    padding-right: 0.63rem;
+
+    &:hover {
+      color: lighten(slategrey, 15%);
+    }
+  }
+
+  &.active {
+    a {
+      background-color: $rose !important;
+      border-color: $rose !important;
+      color: whitesmoke !important;
+    }
+  }
+}
+
+.fadeIn {
+  opacity: 1;
+  animation-name: fadeIn;
+  animation-iteration-count: 1;
+  animation-duration: 0.4s;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.text-whitesmoke {
+  color: darken(whitesmoke, 1%);
+}
+
+.d-none {
+  display: none !important;
+}

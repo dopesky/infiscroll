@@ -1,0 +1,55 @@
+{
+  "name": "@dopesky/infiscroll",
+  "version": "1.0.0",
+  "description": "An Infinite Scroll Helper Complete with image lazy load, show on scroll animation, ajax helpers, toasts and more!",
+  "browser": "dist/js/infiscroll.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build-watch": "gulp",
+    "build-dist": "gulp deploy",
+    "test": "nyc --reporter=lcov mocha test/index.js"
+  },
+  "author": "@dopesky",
+  "license": "MIT",
+  "repository": "github:dopesky/infiscroll",
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/preset-env": "^7.9.6",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "babelify": "^10.0.0",
+    "browser-sync": "^2.26.7",
+    "browserify": "^16.5.1",
+    "chai": "^4.2.0",
+    "gulp": "^4.0.2",
+    "gulp-sass": "^4.1.0",
+    "gulp-terser": "^1.2.0",
+    "jquery": "^3.5.1",
+    "jsdom": "^16.2.2",
+    "mocha": "^7.1.2",
+    "moment": "^2.25.3",
+    "node-sass": "latest",
+    "nyc": "^15.0.1",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "check-coverage": true,
+    "branches": 80,
+    "lines": 85,
+    "functions": 85,
+    "statements": 85
+  }
+}

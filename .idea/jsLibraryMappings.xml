@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <file url="PROJECT" libraries="{@types/bootstrap, @types/browser-sync, @types/chai, @types/datatables.net, @types/datatables.net-autofill, @types/datatables.net-buttons, @types/gulp, @types/gulp-clean-dest, @types/gulp-connect, @types/gulp-minify, @types/gulp-rename, @types/gulp-sass, @types/jquery, all, moment}" />
+    <includedPredefinedLibrary name="Node.js Core" />
+  </component>
+</project>
