@@ -1,11 +1,12 @@
 <p align="center"><img src="http://res.cloudinary.com/dkgtd3pil/image/upload/e_bgremoval,o_100/v1587389258/other_data/Screenshot_21.png"></p>
 <p align="center">
-<a href="https://npmjs.com/package/@dopesky/infiscroll"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@dopesky/infiscroll"></a>
+<a href="https://npmjs.com/package/@dopesky/infiscroll"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@dopesky/infiscroll?logo=npm"></a>
 <a href="https://github.com/dopesky/infiscroll/actions?query=workflow%3Abuild"><img src="https://github.com/dopesky/infiscroll/workflows/build/badge.svg?branch=1.0.0" alt="Build Status"></a>
 <a href='https://coveralls.io/github/dopesky/infiscroll?branch=master'><img src='https://coveralls.io/repos/github/dopesky/infiscroll/badge.svg' alt='Coverage Status' /></a>
-<a href="https://github.com/dopesky/infiscroll/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dopesky/infiscroll" alt="License"></a>
 <a href="https://github.com/dopesky/infiscroll/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/dopesky/infiscroll"></a>
-<a href="https://libraries.io/npm/@dopesky%2Finfiscroll"><img alt="Dependencies" src="https://img.shields.io/librariesio/release/npm/@dopesky/infiscroll"></a>
+<a href="https://github.com/dopesky/infiscroll/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dopesky/infiscroll" alt="License"></a>
+<a href="https://github.com/dopesky/infiscroll/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/dopesky/infiscroll?label=issues"></a>
+<a href="https://gitter.im/infiscroll/community"><img src="https://img.shields.io/badge/chat-on%20gitter-e91e63.svg?logo=gitter" alt="Chat on Gitter"></a>
 </p>
 
 ## About Infiscroll
