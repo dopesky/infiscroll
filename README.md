@@ -10,6 +10,8 @@
 
 ## About Infiscroll
 
+[![Join the chat at https://gitter.im/dopesky-infiscroll/community](https://badges.gitter.im/dopesky-infiscroll/community.svg)](https://gitter.im/dopesky-infiscroll/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Infiscroll is a helper/library that will enable to do things easier. Its features are:
 
 - With the help of [Bootstrap:](https://getbootstrap.com/docs/4.5/getting-started/introduction/) launch toasts, display form errors and toggle disabled state for buttons effortlessly.
