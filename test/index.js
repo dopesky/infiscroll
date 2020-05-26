@@ -15,7 +15,7 @@ function prepareEnvironmentForTesting() {
         observe(target) {
             target['isIntersecting'] = isIntersecting;
             target['target'] = target;
-            return this.callback([target]);
+            return this.callback([target], this);
         }
 
         unobserve() {

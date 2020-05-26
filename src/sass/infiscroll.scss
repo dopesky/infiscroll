@@ -140,6 +140,16 @@ $purple: #9c27b0;
   top: 5%;
   right: 5%;
   z-index: 9999;
+
+  .toast {
+    transition: height 0.2s ease, margin-bottom 0.1s ease;
+
+    .toast.hide {
+      height: 0;
+      margin-bottom: 0;
+    }
+  }
+
   @media all and (max-width: 320px) {
     width: 320px;
     top: 0;
@@ -295,4 +305,8 @@ button, a, input, #show-more * {
 
 .d-none {
   display: none !important;
+}
+
+img {
+  object-fit: cover;
 }
