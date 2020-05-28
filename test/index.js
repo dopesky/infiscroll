@@ -124,6 +124,18 @@ describe('Variable Testing', () => {
         shouldNotBeClickableElement(infiscroll.dataTableButtonLoadingHtml);
     })
 
+    describe('DataTable Non-Editable Button', () => {
+        it('Should be Empty', () => {
+            infiscroll.dataTableNonEditableHtml.should.be.empty;
+        })
+    })
+
+    describe('DataTable Non-Deletable Button', () => {
+        it('Should be Empty', () => {
+            infiscroll.dataTableNonDeletableHtml.should.be.empty;
+        })
+    })
+
     describe('Register Ajax Button', () => {
         shouldExplicitlyBeSubmitButton(infiscroll.buttonHtmlAdd);
     })
@@ -135,8 +147,8 @@ describe('Variable Testing', () => {
     describe('Cancel Update Button', () => {
         shouldExplicitlyNotBeSubmitButton(infiscroll.buttonHtmlCancel);
 
-        it('Should have a an onclick listener set to setEditData() function', () => {
-            infiscroll.buttonHtmlCancel.indexOf('onclick="setEditData()"').should.not.equal(-1, "Valid onclick Listener Not Found");
+        it('Should have a an onclick listener set to infiscroll.setEditData() function', () => {
+            infiscroll.buttonHtmlCancel.indexOf('onclick="infiscroll.setEditData()"').should.not.equal(-1, "Valid onclick Listener Not Found");
         })
     })
 
