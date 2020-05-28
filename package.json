@@ -1,6 +1,6 @@
 {
   "name": "@dopesky/infiscroll",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An Infinite Scroll Helper Complete with image lazy load, show on scroll animation, ajax helpers, toasts and more!",
   "browser": "dist/js/infiscroll.js",
   "directories": {
@@ -15,9 +15,9 @@
   "license": "MIT",
   "repository": "github:dopesky/infiscroll",
   "devDependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/polyfill": "^7.8.7",
-    "@babel/preset-env": "^7.9.6",
+    "@babel/core": "^7.10.1",
+    "@babel/polyfill": "^7.10.1",
+    "@babel/preset-env": "^7.10.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "babelify": "^10.0.0",
     "browser-sync": "^2.26.7",
@@ -28,8 +28,8 @@
     "gulp-terser": "^1.2.0",
     "jquery": "^3.5.1",
     "jsdom": "^16.2.2",
-    "mocha": "^7.1.2",
-    "moment": "^2.25.3",
+    "mocha": "^7.2.0",
+    "moment": "^2.26.0",
     "node-sass": "latest",
     "nyc": "^15.0.1",
     "vinyl-buffer": "^1.0.1",

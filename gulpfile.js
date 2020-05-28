@@ -19,8 +19,8 @@ task('compileJS', () => {
 });
 
 task('compileSass', () => {
-    return src('./src/sass/infiscroll.scss').pipe(sass({outputStyle: 'compressed'}))
-        .on('error', sass.logError).pipe(dest('./dist/css')).pipe(browserSync.reload({stream: true}));
+    return src('./src/sass/infiscroll.scss').pipe(sass({outputStyle: 'compressed'})
+        .on('error', sass.logError)).pipe(dest('./dist/css')).pipe(browserSync.reload({stream: true}));
 });
 
 task('default', () => {
@@ -35,5 +35,5 @@ task('deploy', () => {
         entries: ['./node_modules/@babel/polyfill/dist/polyfill.js', './src/js/infiscroll.js'],
         transform: [babelify]
     }).bundle().pipe(source('infiscroll.js')).pipe(buffer()).pipe(jsMinify()).pipe(dest('./dist/js'))
-    && src('./src/sass/infiscroll.scss').pipe(sass({outputStyle: 'compressed'})).on('error', sass.logError).pipe(dest('./dist/css'));
+    && src('./src/sass/infiscroll.scss').pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError)).pipe(dest('./dist/css'));
 });

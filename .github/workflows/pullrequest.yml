@@ -1,0 +1,27 @@
+name: check
+
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Environment
+        uses: actions/checkout@v2
+
+      - name: Setup Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Download Dependencies and Perform Tests
+        run: npm install-ci-test
+
+  greeting:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: 'Thank you for Contributing to the Project. Good Work!'
