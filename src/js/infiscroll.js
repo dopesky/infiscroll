@@ -1,3 +1,4 @@
+// TODO: In next major release, make this a class.
 let infiscroll = {
     validToastTypes: {
         success: `<strong><i class="fa fa-check-circle"></i> Success: </strong>`,
@@ -62,9 +63,11 @@ let infiscroll = {
     dataTableRestoreButton: `<i class="fas fa-check-circle"></i> <span class="d-none d-xl-inline">Restore</span>`,
     dataTableDeleteButton: `<i class="fas fa-times-circle"></i> <span class="d-none d-xl-inline">Delete</span>`,
     dataTableButtonLoadingHtml: `<span class="fa fa-spin fa-spinner"></span> <span class="d-none d-xl-inline"> Working</span>`,
+    dataTableNonEditableHtml: ``,
+    dataTableNonDeletableHtml: ``,
     buttonHtmlAdd: `<button type="submit" class="btn btn-success btn-sm">Add</button>`,
     buttonHtmlEdit: `<button type="submit" class="btn btn-info mr-3 btn-sm">Update</button>`,
-    buttonHtmlCancel: `<button type="button" onclick="setEditData()" class="btn btn-danger btn-sm">Cancel</button>`,
+    buttonHtmlCancel: `<button type="button" onclick="infiscroll.setEditData()" class="btn btn-danger btn-sm">Cancel</button>`,
     buttonLoadingHtml: `Working . . .`,
     buttonLoadMoreHtml: `<button class="btn btn-primary px-2 py-1 text-center"><i class="fas fa-hand-point-up mr-1"></i> Load New . . .</button>`,
     buttonLoadMoreLoadingHtml: `<i class="spinner-border spinner-border-sm"></i> Fetching . . .`,
@@ -83,7 +86,7 @@ let infiscroll = {
             $('body').append(`<div id="site-info"></div>`);
             return this.setToast(options);
         }
-        let {message = 'No Message Passed!', type = 'danger', delay = 5000, classes = 'mb-3'} = options;
+        let {message = 'No Message Passed!', type = 'danger', delay = 5000, classes = ''} = options;
         type = type.toLowerCase().trim();
         if (!this.validToastTypes.hasOwnProperty(type)) return false;
         const html = `<div class="toast ${classes}" role="alert" aria-live="assertive" aria-atomic="true" data-delay="${delay}"
@@ -246,15 +249,17 @@ let infiscroll = {
                         class: 'text-center',
                         render: (data, type, full) => {
                             if (!full.hasOwnProperty(deleteMarker)) return data;
-                            const restoreButton = `<button onclick="infiscroll.deleteRestore(this, ${data}, 0, '${ajax.url}', '${table}')" 
+                            const {url, deleteURL} = ajax;
+                            const restoreButton = `<button onclick="infiscroll.deleteRestore(this, ${data}, 0, '${deleteURL || url}', '${table}')" 
                                 class='btn btn-sm btn-success' title='Restore'>${this.dataTableRestoreButton}</button>`;
-                            const deleteButton = `<button onclick="infiscroll.deleteRestore(this, ${data}, 1, '${ajax.url}', '${table}')" 
+                            const deleteButton = `<button onclick="infiscroll.deleteRestore(this, ${data}, 1, '${deleteURL || url}', '${table}')" 
                                 class='btn btn-sm btn-danger' title='Delete'>${this.dataTableDeleteButton}</button>`;
-                            const editButton = editableRecords ? `<button onclick='infiscroll.setEditData(${this.stringify(full)})' 
-                                class='btn btn-sm btn-info' title='Edit'>${this.dataTableEditButton}</button>` : '';
+                            const editButton = editableRecords && (!full.hasOwnProperty('editable') || full.editable) ?
+                                `<button onclick='infiscroll.setEditData(${this.stringify(full)})' 
+                                class='btn btn-sm btn-info' title='Edit'>${this.dataTableEditButton}</button>` : this.dataTableNonEditableHtml;
                             return `<div class='d-flex align-items-center
                                 justify-content-${deletableRecords && editableRecords ? 'around' : 'center'}'>${editButton}
-                                ${deletableRecords ? (full[deleteMarker] ? restoreButton : deleteButton) : ''}</div>`;
+                                ${deletableRecords && (!full.hasOwnProperty('deletable') || full.deletable) ? (full[deleteMarker] ? restoreButton : deleteButton) : this.dataTableNonDeletableHtml}</div>`;
                         },
                     })
                 }
@@ -268,22 +273,25 @@ let infiscroll = {
         return $(table).DataTable(options);
     },
 
-    addAjax: async function ({form = 'form', url = '', dataTable = null}) {
+    addAjax: async function ({form = 'form', url = '', dataTable = null, formData = {}, successMessage = `Record Successfully Registered.`, resetForm = true}) {
         form = $(form);
         const button = form.find('button[type=submit]');
         let data = new FormData(form[0]);
+        Object.keys(formData).forEach(key => {
+            data.append(key, formData[key]);
+        })
         this.toggleButton({button, html: this.buttonLoadingHtml});
         let returnValue;
         try {
             let response = await this.makeAjaxRequest({url, data, hasImages: true});
             if (response.ok) {
                 this.setToast({
-                    message: `Record Successfully Registered.`,
+                    message: successMessage,
                     type: 'success'
                 });
                 this.setFormErrors();
                 if (dataTable) dataTable.ajax.reload();
-                form[0].reset();
+                if (resetForm) form[0].reset();
             } else {
                 this.setFormErrors([response.error]);
             }
@@ -296,7 +304,7 @@ let infiscroll = {
         return returnValue;
     },
 
-    editAjax: async function ({form = 'form', url = '', dataTable = null, formData = {}}) {
+    editAjax: async function ({form = 'form', url = '', dataTable = null, formData = {}, successMessage = `Record Successfully Updated.`, resetForm = true}) {
         form = $(form);
         const button = form.find('button[type=submit]');
         let data = new FormData(form[0]);
@@ -309,12 +317,12 @@ let infiscroll = {
             let response = await this.makeAjaxRequest({url, data, hasImages: true, method: 'POST'});
             if (response.ok) {
                 this.setToast({
-                    message: `Record Successfully Updated.`,
+                    message: successMessage,
                     type: 'success'
                 });
                 this.setFormErrors();
                 if (dataTable) dataTable.ajax.reload();
-                this.setEditData();
+                if (resetForm) this.setEditData();
             } else {
                 this.setFormErrors([response.error]);
                 this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
@@ -328,18 +336,20 @@ let infiscroll = {
         return returnValue;
     },
 
-    deleteRestore: async function (button, id, suspend, url, table) {
-        const buttonHtml = suspend ? this.dataTableDeleteButton : this.dataTableRestoreButton;
-        this.toggleButton({button, html: this.dataTableButtonLoadingHtml});
+    deleteRestore: async function (button, id, suspend, url, table, {
+        buttonAllHtml = '', buttonLoadingHtml = '', method = 'DELETE', formData = {}, successMessage = `Record Successfully ${suspend ? 'Suspended' : 'Restored'}.`
+    } = {}) {
+        const buttonHtml = buttonAllHtml || (suspend ? this.dataTableDeleteButton : this.dataTableRestoreButton);
+        this.toggleButton({button, html: buttonLoadingHtml || this.dataTableButtonLoadingHtml});
         let response = null;
         try {
-            response = await this.makeAjaxRequest({url, data: {id}, method: 'DELETE'});
+            response = await this.makeAjaxRequest({url, data: {...formData, id}, method});
             if (response.ok) {
                 this.setToast({
-                    message: `Record Successfully ${suspend ? 'Suspended' : 'Restored'}.`,
+                    message: successMessage,
                     type: 'success'
                 });
-                new $.fn.dataTable.Api(table).ajax.reload();
+                if (table) new $.fn.dataTable.Api(table).ajax.reload();
             } else {
                 this.setToast({
                     message: `${response.error}`,
@@ -355,14 +365,14 @@ let infiscroll = {
         return response;
     },
 
-    setEditData: function (data = null, form = 'form') {
+    setEditData: function (data = null, form = 'form', {scrollToTop = true} = {}) {
         this.setFormErrors();
         form = $(form);
         this.pageState = data ? 'edit' : 'add';
         let pageTitles = document.querySelectorAll('.page-title');
         let buttonDiv = $('#button-div');
         data = data ? this.parse(data) : data;
-        this.setEditDataProcess(data);
+        this.setEditDataPreProcess(data, this.pageState);
         if (data) {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.edit;
@@ -373,7 +383,7 @@ let infiscroll = {
                 form.find(`input[name=${item}], select[name=${item}], textarea[name=${item}]`)
                     .not('.ignore').val(data[item]);
             }
-            $('body, html').animate({scrollTop: 0});
+            if (scrollToTop) $('body, html').animate({scrollTop: 0});
         } else {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.add;
@@ -381,12 +391,15 @@ let infiscroll = {
             buttonDiv.html(this.buttonHtmlAdd);
             form[0].reset();
         }
-
+        this.setEditDataPostProcess(data, this.pageState);
         return this.pageState;
     },
 
-    setEditDataProcess: (data) => data,
+    setEditDataPreProcess: () => true,
 
+    setEditDataPostProcess: () => true,
+
+    // TODO: find a way to override the form errors and support toasts too
     handleAjaxErrorResponse: function (response, logErrors = true) {
         let description = '';
         if (response.status === 403) {
