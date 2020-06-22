@@ -32,6 +32,8 @@
     "moment": "^2.26.0",
     "node-sass": "latest",
     "nyc": "^15.0.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.3",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
