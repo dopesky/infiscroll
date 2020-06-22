@@ -1,10 +1,10 @@
-require('@babel/polyfill');
 const {describe, it, before} = require("mocha");
 const chai = require('chai');
 const should = chai.should();
 let isIntersecting = true;
 prepareEnvironmentForTesting();
-const {infiscroll} = require('../src/js/infiscroll');
+const Infiscroll = require('../src/js/infiscroll');
+let infiscroll = new Infiscroll();
 
 function prepareEnvironmentForTesting() {
     global['IntersectionObserver'] = class IntersectionObserver {
@@ -45,17 +45,6 @@ function shouldExplicitlyBeSubmitButton(variable) {
     it('Should Explicitly be a Submit Button', () => {
         variable.indexOf('button').should.not.equal(-1, "Variable does not Create a button");
         variable.indexOf('type="submit"').should.not.equal(-1, "Created button is not explicitly a submit button");
-    })
-}
-
-function shouldExplicitlyNotBeSubmitButton(variable) {
-    it('Should be a string', () => {
-        variable.should.be.a('string');
-    })
-
-    it('Should Explicitly be a Button that is not a Submit Button', () => {
-        variable.indexOf('button').should.not.equal(-1, "Variable does not Create a button");
-        variable.indexOf('type="button"').should.not.equal(-1, "Created button is not explicitly of type \"button\"");
     })
 }
 
@@ -144,14 +133,6 @@ describe('Variable Testing', () => {
         shouldExplicitlyBeSubmitButton(infiscroll.buttonHtmlEdit);
     })
 
-    describe('Cancel Update Button', () => {
-        shouldExplicitlyNotBeSubmitButton(infiscroll.buttonHtmlCancel);
-
-        it('Should have a an onclick listener set to infiscroll.setEditData() function', () => {
-            infiscroll.buttonHtmlCancel.indexOf('onclick="infiscroll.setEditData()"').should.not.equal(-1, "Valid onclick Listener Not Found");
-        })
-    })
-
     describe('Loading Button', () => {
         shouldNotBeClickableElement(infiscroll.buttonLoadingHtml);
     })
@@ -177,7 +158,6 @@ describe('Variable Testing', () => {
         })
     })
 })
-
 
 describe('Function Testing', () => {
     before('Prepare DOM for Testing', () => {
@@ -205,6 +185,7 @@ describe('Function Testing', () => {
         body.append("<div class='page-title' data-add='Add' data-edit='Edit'></div><form><input type='text' name='ok' value='1'><input type='text' name='error'><button>Submit</button></form>");
         body.append("<img src='https://source.unsplash.com/random' alt='Dummy' class='lazy-load-image' data-src='https://source.unsplash.com/random' data-srcset='elva-fairy-480w.jpg 480w, elva-fairy-800w.jpg 800w'>");
         body.append("<div class='lazy-load' data-src='https://source.unsplash.com/random'></div>");
+        body.append("<div id='form-errors-container'><div id='form-errors'></div></div>");
         $.fn.toast = () => {
             return true;
         };
@@ -217,7 +198,17 @@ describe('Function Testing', () => {
             };
             let columnDefs = options.columnDefs;
             columnDefs.forEach(columnDef => {
-                if (columnDef.hasOwnProperty('render')) columnDef.render(full.id, 'display', full);
+                if (columnDef.hasOwnProperty('render')) {
+                    columnDef.render(full.id, 'display', full);
+                    columnDef.render(full.id, 'display', {...full, ...{suspended: true}});
+                    columnDef.render(full.id, 'display', {
+                        ...full, ...{
+                            editable: false,
+                            deletable: false,
+                            suspended: true
+                        }
+                    });
+                }
             })
             return true;
         };
@@ -239,6 +230,15 @@ describe('Function Testing', () => {
                 }
             }
         };
+    })
+
+    describe('Cancel Update Button', () => {
+        it("Should be a Function that returns a HtmlElement", () => {
+            (typeof infiscroll.buttonHtmlCancel).should.be.equal('function');
+            infiscroll.buttonHtmlCancel().type.should.be.equal('button');
+            infiscroll.buttonHtmlCancel().innerText.should.be.equal('Cancel');
+            infiscroll.buttonHtmlCancel().click();
+        })
     })
 
     describe('Set Toast Function', () => {
@@ -359,6 +359,8 @@ describe('Function Testing', () => {
     describe('Initialize Scroll Animation Function', () => {
         it('Should Observe the Element to Reveal on Scroll', () => {
             infiscroll.initScrollAnimation().should.be.equal(true);
+            $('.show-on-scroll').attr({"data-infinite": "false"});
+            infiscroll.initScrollAnimation().should.be.equal(true);
             isIntersecting = false;
             infiscroll.initScrollAnimation().should.be.equal(true);
             isIntersecting = true;
@@ -372,6 +374,9 @@ describe('Function Testing', () => {
     describe('Initialize Lazy Loading Function', () => {
         it('Should Observe the Element to Load Image on Page Scroll', () => {
             infiscroll.initLazyLoading().should.be.equal(true);
+            isIntersecting = false;
+            infiscroll.initLazyLoading().should.be.equal(true);
+            isIntersecting = true;
             infiscroll.initLazyLoading('.lazy-load-image').should.be.equal(true);
         })
 
@@ -385,11 +390,20 @@ describe('Function Testing', () => {
             infiscroll.initInfiniteScroll('https://jsonplaceholder.typicode.com/posts', () => {
                 return {newItems: 200, hasMoreItems: false, offset: 20, size: 200};
             }, '.show-on-scroll').should.be.equal(true);
+            isIntersecting = false;
+            infiscroll.initInfiniteScroll('https://jsonplaceholder.typicode.com/posts', () => {
+                return {newItems: 200, hasMoreItems: false, offset: 20, size: 200};
+            }, '.show-on-scroll').should.be.equal(true);
+            isIntersecting = true;
         })
 
         it('Should Return False if Wrong Url is Passed or no Targets are found', () => {
             infiscroll.initInfiniteScroll(false, (data) => data, '.show-on-scroll').should.be.equal(false);
             infiscroll.initInfiniteScroll('https://jsonplaceholder.typicode.com/posts', (data) => data, '.not-in-dom').should.be.equal(false);
+        })
+
+        it('Should Load New Items', () => {
+            $('#show-more').children().trigger('click');
         })
     })
 
@@ -397,10 +411,8 @@ describe('Function Testing', () => {
         it('Should Create a DataTable', () => {
             infiscroll.createDataTable({ajax: {}, isServerSide: true, processing: true}).should.be.equal(true);
             infiscroll.createDataTable({isCrud: false}).should.be.equal(true);
-        })
-
-        it('Should Fail to Create DataTable if Wrong Parameters are Passed', () => {
-            should.Throw(() => infiscroll.createDataTable({}), TypeError);
+            infiscroll.createDataTable({deletableRecords: false}).should.be.equal(true);
+            infiscroll.createDataTable({deleteMarker: 'none'}).should.be.equal(true);
         })
     })
 
@@ -424,24 +436,38 @@ describe('Function Testing', () => {
 
     describe('Delete Restore Data via Ajax Function', () => {
         it('Should Delete data to the Backend Successfully', (done) => {
-            infiscroll.deleteRestore('#test-toggle-button', infiscroll.stringify({ok: 1}), true, '', 'table').then((data) => {
+            infiscroll.deleteRestore({
+                button: '#test-toggle-button',
+                id: infiscroll.stringify({ok: 1}),
+                suspend: true,
+                url: '',
+                table: 'table'
+            }).then((data) => {
                 data.should.be.eql({ok: 1});
                 done();
             });
         })
 
         it('Should Restore data to the Backend Successfully', (done) => {
-            infiscroll.deleteRestore('#test-toggle-button', infiscroll.stringify({ok: 1}), false, '', 'table').then((data) => {
+            infiscroll.deleteRestore({
+                button: '#test-toggle-button',
+                id: infiscroll.stringify({ok: 1}),
+                suspend: false,
+                url: '',
+                table: 'table'
+            }).then((data) => {
                 data.should.be.eql({ok: 1});
                 done();
             });
         })
 
         it('Should Handle Any Errors Successfully', (done) => {
-            infiscroll.deleteRestore('#test-toggle-button', infiscroll.stringify({
-                ok: 0,
-                error: 'An Error!'
-            }), false, '', 'table').then((data) => {
+            infiscroll.deleteRestore({
+                button: '#test-toggle-button', id: infiscroll.stringify({
+                    ok: 0,
+                    error: 'An Error!'
+                }), suspend: false, url: '', table: 'table'
+            }).then((data) => {
                 data.should.be.eql({ok: 0, error: 'An Error!'});
                 done();
             });
@@ -460,14 +486,20 @@ describe('Function Testing', () => {
 
     describe('Handle Ajax Error Function', () => {
         it('Should Handle a 403 Error', () => {
-            infiscroll.handleAjaxErrorResponse({status: 403}, false).toLowerCase().should.be.equal('forbidden');
+            infiscroll.handleAjaxErrorResponse({status: 403}, false, false).toLowerCase().should.be.equal('forbidden');
+            infiscroll.handleAjaxErrorResponse({status: 403}, true, false).toLowerCase().should.be.equal('forbidden');
         })
 
         it('Should Handle a 422 Error', () => {
             infiscroll.handleAjaxErrorResponse({
                 status: 422,
                 responseJSON: {errors: {error1: ['error1'], error2: ['error2']}}
-            }, false).toLowerCase().should.be.equal('unprocessed entity');
+            }, false, false).toLowerCase().should.be.equal('unprocessed entity');
+
+            infiscroll.handleAjaxErrorResponse({
+                status: 422,
+                responseJSON: {errors: {error1: ['error1'], error2: ['error2']}}
+            }, true, false).toLowerCase().should.be.equal('unprocessed entity');
         })
     })
 })
