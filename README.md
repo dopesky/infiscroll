@@ -1,4 +1,4 @@
-<p align="center"><img src="http://res.cloudinary.com/dkgtd3pil/image/upload/e_bgremoval,o_100/v1587389258/other_data/Screenshot_21.png"></p>
+<p align="center"><img src="https://res.cloudinary.com/dkgtd3pil/image/upload/e_bgremoval,o_100/v1587389258/other_data/Screenshot_21.png"></p>
 <p align="center">
 <a href="https://npmjs.com/package/@dopesky/infiscroll"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@dopesky/infiscroll?logo=npm"></a>
 <a href="https://github.com/dopesky/infiscroll/actions?query=workflow%3Abuild"><img src="https://github.com/dopesky/infiscroll/workflows/build/badge.svg?branch=1.0.2" alt="Build Status"></a>
