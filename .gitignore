@@ -60,7 +60,6 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 node_modules/
-docs/
 dist/
 
 .nyc_output
