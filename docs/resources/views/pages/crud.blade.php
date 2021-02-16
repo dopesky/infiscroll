@@ -33,12 +33,12 @@
                                           onsubmit="return add_or_edit(event)" class="form-row">
                                         <input type="hidden" name="id">
                                         <div class="form-group col-12">
-                                            <div class="custom-file">
-                                                <input type="file" name="image"
-                                                       accept=".jpeg,.jpg,.png,.bmp,.gif,.svg,.webp"
-                                                       class="custom-file-input ignore" id="image">
-                                                <label class="custom-file-label" for="image">Select Image</label>
-                                            </div>
+                                            <label class="input-group">
+                                                <span class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                </span>
+                                                <input type="text" class="form-control" placeholder="Username . . ." name="username">
+                                            </label>
                                         </div>
                                         <div class="form-group col-12">
                                             <label for="text">Description</label>
@@ -159,28 +159,16 @@
                 }
             });
 
-        $(".custom-file-input").on("change", function () {
-            $(this).siblings(".custom-file-label").addClass("selected").html($(this).val().split("\\").pop() || 'Select Image');
-        });
-
         function add_or_edit(event) {
             event.preventDefault();
             if (infiscrollObject.pageState === 'add') {
-                return infiscrollObject.addAjax({url: "{{route('post.post')}}", dataTable}).then(({ok = false}) => {
-                    if (ok) {
-                        $('.custom-file-input').siblings(".custom-file-label").removeClass("selected").html("Select Image");
-                    }
-                });
+                return infiscrollObject.addAjax({url: "{{route('post.post')}}", dataTable});
             } else {
                 return infiscrollObject.editAjax({
                     url: "{{route('post.put')}}",
                     dataTable,
                     method: 'POST',
                     formData: {_method: 'PUT'}
-                }).then(({ok = false}) => {
-                    if (ok) {
-                        $('.custom-file-input').siblings(".custom-file-label").removeClass("selected").html("Select Image");
-                    }
                 });
             }
         }

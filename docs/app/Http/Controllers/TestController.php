@@ -5,32 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AddPostValidation;
 use App\Http\Requests\DeletePostValidation;
 use App\Http\Requests\EditPostValidation;
-use App\User;
+use App\Post;
 use App\UserModel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class TestController extends Controller {
     function add_post(AddPostValidation $request) {
-        $image = $request->file('image');
-        $post = new User();
-        $post->user_id = factory(UserModel::class)->create()->user_id;
-        $post->text = $request->post('text');
-        $post->image = (new Media)->upload_to_cloud($image->getPathname());
-        if ($post->save()) {
-            return response()->json(['ok' => true, 'error' => false]);
-        } else {
-            return response()->json(['ok' => false, 'error' => 'An Unexpected Error Occurred. Try Again!']);
-        }
+        $user = factory(UserModel::class)->create(['username' => $request->post('username')]);
+        $post = factory(Post::class)->create(['text' => $request->post('text'), 'user_id' => $user['user_id']]);
+        if (!$post) return response()->json(['ok' => false, 'error' => 'An Unexpected Error Occurred. Try Again!']);
+        return response()->json(['ok' => true, 'error' => false]);
     }
 
     function edit_post(EditPostValidation $request) {
         $post = $request->post;
         $post->text = $request->post('text');
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $post->image = (new Media)->upload_to_cloud($image->getPathname());
-        }
+        $post->user_id = $request->user->user_id;
         if ($post->save()) {
             return response()->json(['ok' => true, 'error' => false]);
         } else {
@@ -49,7 +40,7 @@ class TestController extends Controller {
     }
 
     function get_posts() {
-        $data = (new User)->all()->map(function (User $post) {
+        $data = (new Post)->all()->map(function (Post $post) {
             $post['user'] = $post->user()->first();
             return $post;
         });
@@ -61,16 +52,23 @@ class TestController extends Controller {
         $size = intval($request->post('size'));
         $previous_new = intval($request->post('newItems'));
 
-        $count = (new User)->count(); // apply all necessary filters necessary here too
+        if ($size !== -1) {
+            factory(UserModel::class, 1)->create()->each(function (UserModel $user) {
+                $now = now()->format('Y-m-d H:i:s');
+                factory(Post::class, 1)->create(['user_id' => $user->user_id, 'updated_at' => $now]);
+            });
+        }
+
+        $count = (new Post)->count(); // apply all necessary filters necessary here too
         $new = $size !== -1 && $count > $size ? $count - $size : 0;
         $offset += $new;
         $size = $count;
 
         if ($request->has('loadNewItems')) {
-            $data = $this->map_data_array((new User)->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->limit($new + $previous_new)->offset(0)->get());
+            $data = $this->map_data_array((new Post)->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->limit($new + $previous_new)->offset(0)->get());
             $response = ['offset' => $offset, 'size' => $size, 'data' => $data, 'newItems' => 0, 'loadNewItems' => true];
         } else {
-            $data = $this->map_data_array((new User)->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->limit(11)->offset($offset)->get());
+            $data = $this->map_data_array((new Post)->orderBy('updated_at', 'desc')->orderBy('id', 'desc')->limit(11)->offset($offset)->get());
 
             $more = count($data) === 11;
             $data = array_slice($data, 0, 10);
@@ -83,10 +81,10 @@ class TestController extends Controller {
     }
 
     private function map_data_array(Collection $data) {
-        return $data->map(function (User $user) {
-            $user['user'] = $user->user()->first();
-            $user['user']['profile'] = "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user['user']['email']))) . "?d=wavatar";
-            return $user;
+        return $data->map(function (Post $post) {
+            $post['user'] = $post->user()->first();
+            $post['user']['profile'] = "https://www.gravatar.com/avatar/" . md5(strtolower(trim($post['user']['email']))) . "?d=wavatar";
+            return $post;
         })->toArray();
     }
 }

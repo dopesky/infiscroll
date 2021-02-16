@@ -36,7 +36,7 @@
                         data-src="${item.image}" alt="..." class="card-img-top rounded-0">
                     <div class="card-body">
                         <p class="card-text font-sm">${item.text}</p>
-                        <small class="font-xs text-uppercase">${infiscrollObject.getTimezoneEquivalentDate(updated_at).fromNow()}</small>
+                        <small class="font-xs text-uppercase">${infiscrollObject.getClientTimeFromServerTime(updated_at, 180).fromNow()}</small>
                     </div>
                </div>`;
                 if (isNew) {

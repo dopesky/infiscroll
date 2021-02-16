@@ -2,14 +2,21 @@
 
 namespace App\Http\Requests;
 
-use App\User;
+use App\Post;
+use App\UserModel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class EditPostValidation extends FormRequest {
     /**
-     * @var User
+     * @var Post
      */
     public $post;
+
+    /**
+     * @var UserModel
+     */
+    public $user;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +24,8 @@ class EditPostValidation extends FormRequest {
      * @return bool
      */
     public function authorize() {
-        return true;
+        $this->post = (new Post)->find($this->post('id'));
+        return !empty($this->post);
     }
 
     /**
@@ -27,14 +35,13 @@ class EditPostValidation extends FormRequest {
      */
     public function rules() {
         return [
-            'id' => ['bail', 'required', 'numeric', function($attr, $value, $fail){
-                $this->post = (new User)->find($value);
-                if(empty($this->post)){
-                    $fail('Post Could Not Be Recognized. Try Again!');
+            'text' => ['bail', 'required', 'max:65535'],
+            'username' => ['bail', 'required', 'min:3', 'alpha_dash', function($attr, $value){
+                $this->user = (new UserModel)->where('username', $value)->first();
+                if(empty($this->user)){
+                    $this->user = factory(UserModel::class)->create(['username' => $value]);
                 }
             }],
-            'text' => ['bail', 'required', 'max:65535'],
-            'image' => ['bail', 'image', 'mimes:jpeg,jpg,png,bmp,gif,svg,webp', 'max:25600'],
         ];
     }
 }

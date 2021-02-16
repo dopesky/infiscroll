@@ -30,7 +30,6 @@ class CreateUsersTable extends Migration {
      * @return void
      */
     public function down() {
-        print_r((new Media)->delete_all_resources());
         Schema::dropIfExists('tbl_posts');
     }
 }

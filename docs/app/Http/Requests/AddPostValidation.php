@@ -22,7 +22,7 @@ class AddPostValidation extends FormRequest {
     public function rules() {
         return [
             'text' => ['bail', 'required', 'max:65535'],
-            'image' => ['bail', 'required', 'image', 'mimes:jpeg,jpg,png,bmp,gif,svg,webp', 'max:25600'],
+            'username' => ['bail', 'required', 'min:3', 'alpha_dash', 'unique:tbl_users']
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent;
  * @property string image
  * @property bool suspended
  */
-class User extends Eloquent\Model {
+class Post extends Eloquent\Model {
     protected $table = 'tbl_posts';
     protected $casts = ['suspended' => 'boolean'];
 
