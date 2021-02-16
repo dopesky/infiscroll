@@ -2,8 +2,9 @@
 
 namespace App;
 
-use Carbon\Carbon;
+use Database\Factories\PostsFactory;
 use Illuminate\Database\Eloquent;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Class User
@@ -15,10 +16,16 @@ use Illuminate\Database\Eloquent;
  * @property bool suspended
  */
 class Post extends Eloquent\Model {
+    use HasFactory;
+
     protected $table = 'tbl_posts';
     protected $casts = ['suspended' => 'boolean'];
 
-    public function user(){
+    public function user(): Eloquent\Relations\BelongsTo {
         return $this->belongsTo('App\UserModel', 'user_id', 'user_id');
+    }
+
+    protected static function newFactory(): PostsFactory {
+        return PostsFactory::new();
     }
 }

@@ -8,17 +8,18 @@ use App\Http\Requests\EditPostValidation;
 use App\Post;
 use App\UserModel;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TestController extends Controller {
-    function add_post(AddPostValidation $request) {
-        $user = factory(UserModel::class)->create(['username' => $request->post('username')]);
-        $post = factory(Post::class)->create(['text' => $request->post('text'), 'user_id' => $user['user_id']]);
+    function add_post(AddPostValidation $request): JsonResponse {
+        $user = UserModel::factory()->create(['username' => $request->post('username')]);
+        $post = Post::factory()->create(['text' => $request->post('text'), 'user_id' => $user['user_id']]);
         if (!$post) return response()->json(['ok' => false, 'error' => 'An Unexpected Error Occurred. Try Again!']);
         return response()->json(['ok' => true, 'error' => false]);
     }
 
-    function edit_post(EditPostValidation $request) {
+    function edit_post(EditPostValidation $request): JsonResponse {
         $post = $request->post;
         $post->text = $request->post('text');
         $post->user_id = $request->user->user_id;
@@ -29,7 +30,7 @@ class TestController extends Controller {
         }
     }
 
-    function delete_restore_post(DeletePostValidation $request) {
+    function delete_restore_post(DeletePostValidation $request): JsonResponse {
         $post = $request->post;
         $post->suspended = !$post->suspended;
         if ($post->save()) {
@@ -39,7 +40,7 @@ class TestController extends Controller {
         }
     }
 
-    function get_posts() {
+    function get_posts(): JsonResponse {
         $data = (new Post)->all()->map(function (Post $post) {
             $post['user'] = $post->user()->first();
             return $post;
@@ -47,15 +48,15 @@ class TestController extends Controller {
         return response()->json(['ok' => true, 'data' => $data]);
     }
 
-    function index(Request $request) {
+    function index(Request $request): JsonResponse {
         $offset = intval($request->post('offset'));
         $size = intval($request->post('size'));
         $previous_new = intval($request->post('newItems'));
 
         if ($size !== -1) {
-            factory(UserModel::class, 1)->create()->each(function (UserModel $user) {
+            UserModel::factory()->create()->each(function (UserModel $user) {
                 $now = now()->format('Y-m-d H:i:s');
-                factory(Post::class, 1)->create(['user_id' => $user->user_id, 'updated_at' => $now]);
+                Post::factory()->create(['user_id' => $user->user_id, 'updated_at' => $now]);
             });
         }
 
@@ -80,7 +81,7 @@ class TestController extends Controller {
 
     }
 
-    private function map_data_array(Collection $data) {
+    private function map_data_array(Collection $data): array {
         return $data->map(function (Post $post) {
             $post['user'] = $post->user()->first();
             $post['user']['profile'] = "https://www.gravatar.com/avatar/" . md5(strtolower(trim($post['user']['email']))) . "?d=wavatar";

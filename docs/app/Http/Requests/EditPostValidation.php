@@ -23,7 +23,7 @@ class EditPostValidation extends FormRequest {
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize(): bool {
         $this->post = (new Post)->find($this->post('id'));
         return !empty($this->post);
     }
@@ -33,13 +33,13 @@ class EditPostValidation extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules(): array {
         return [
             'text' => ['bail', 'required', 'max:65535'],
             'username' => ['bail', 'required', 'min:3', 'alpha_dash', function($attr, $value){
                 $this->user = (new UserModel)->where('username', $value)->first();
                 if(empty($this->user)){
-                    $this->user = factory(UserModel::class)->create(['username' => $value]);
+                    $this->user = UserModel::factory()->create(['username' => $value]);
                 }
             }],
         ];

@@ -27,15 +27,15 @@
                         $readme = file_get_contents(config('app.env') === 'local' ? '../README.md' : 'https://unpkg.com/@dopesky/infiscroll@latest/README.md');
                         $readme = $parser->text($readme);
 
-                        function openFunction($functionName){return "<b>$functionName ( </b>";}
+                        function openFunction($functionName):string{return "<b>$functionName ( </b>";}
 
-                        function openProperty($propertyName){return "<b>$propertyName: </b>";}
+                        function openProperty($propertyName):string{return "<b>$propertyName: </b>";}
 
-                        function closeFunction(){return "<b>)</b>:";}
+                        function closeFunction():string{return "<b>)</b>:";}
 
-                        function returnType($type, $default = '', $use_default_as_is = false){return "<em class='text-purple'>$type</em>" . ($default || $use_default_as_is ? " = <i>$default</i>" : '');}
+                        function returnType($type, $default = '', $use_default_as_is = false):string{return "<em class='text-purple'>$type</em>" . ($default || $use_default_as_is ? " = <i>$default</i>" : '');}
 
-                        function arguments($arg, $type, $default = '', $use_default_as_is = false){return "<span class='text-rose'>$arg:</span> " . returnType($type, $default, $use_default_as_is);}
+                        function arguments($arg, $type, $default = '', $use_default_as_is = false):string{return "<span class='text-rose'>$arg:</span> " . returnType($type, $default, $use_default_as_is);}
                     @endphp
                     <ul class="nav nav-pills nav-justified bg-light border-bottom rounded font-sm">
                         <li class="nav-item">

@@ -16,7 +16,7 @@ class DeletePostValidation extends FormRequest {
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize(): bool {
         return true;
     }
 
@@ -25,7 +25,7 @@ class DeletePostValidation extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules(): array {
         return [
             'id' => ['bail', 'required', 'numeric', function($attr, $value, $fail){
                 $this->post = (new Post)->find($value);

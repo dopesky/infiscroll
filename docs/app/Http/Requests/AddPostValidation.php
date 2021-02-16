@@ -10,7 +10,7 @@ class AddPostValidation extends FormRequest {
      *
      * @return bool
      */
-    public function authorize() {
+    public function authorize(): bool {
         return true;
     }
 
@@ -19,7 +19,7 @@ class AddPostValidation extends FormRequest {
      *
      * @return array
      */
-    public function rules() {
+    public function rules(): array {
         return [
             'text' => ['bail', 'required', 'max:65535'],
             'username' => ['bail', 'required', 'min:3', 'alpha_dash', 'unique:tbl_users']
