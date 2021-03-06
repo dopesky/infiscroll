@@ -1,12 +1,14 @@
 require('@babel/polyfill');
-
+// TODO: Support Inline Error Messages in Forms
+// TODO: Add Support for Laravel Livewire
+// TODO: Join the common parts of addAjax and editAjax to one function
 class Infiscroll {
     constructor(options = {}) {
         this.validToastTypes = options.validToastTypes || {
-            success: `<strong><i class="fa fa-check-circle"></i> Success: </strong>`,
-            danger: `<strong><i class="fa fa-times-circle"></i> Error: </strong>`,
-            info: `<strong><i class="fa fa-info-circle"></i> Info: </strong>`,
-            warning: `<strong><i class="fa fa-exclamation-circle"></i> Warning: </strong>`
+            success: `<strong><i class="fas fa-check-circle"></i> Success: </strong>`,
+            danger: `<strong><i class="fas fa-times-circle"></i> Error: </strong>`,
+            info: `<strong><i class="fas fa-info-circle"></i> Info: </strong>`,
+            warning: `<strong><i class="fas fa-exclamation-circle"></i> Warning: </strong>`
         };
         this.infiniteScrollObject = options.infiniteScrollObject || {
             ajax: {},
@@ -64,19 +66,12 @@ class Infiscroll {
         this.dataTableEditButton = options.dataTableEditButton || `<i class="fas fa-edit"></i> <span class="d-none d-xl-inline">Edit</span>`;
         this.dataTableRestoreButton = options.dataTableRestoreButton || `<i class="fas fa-check-circle"></i> <span class="d-none d-xl-inline">Restore</span>`;
         this.dataTableDeleteButton = options.dataTableDeleteButton || `<i class="fas fa-times-circle"></i> <span class="d-none d-xl-inline">Delete</span>`;
-        this.dataTableButtonLoadingHtml = options.dataTableButtonLoadingHtml || `<span class="fa fa-spin fa-spinner"></span> <span class="d-none d-xl-inline"> Working</span>`;
+        this.dataTableButtonLoadingHtml = options.dataTableButtonLoadingHtml || `<span class="fas fa-spin fa-spinner"></span> <span class="d-none d-xl-inline"> Working</span>`;
         this.dataTableNonEditableHtml = options.dataTableNonEditableHtml || ``;
         this.dataTableNonDeletableHtml = options.dataTableNonDeletableHtml || ``;
         this.buttonHtmlAdd = options.buttonHtmlAdd || `<button type="submit" class="btn btn-success btn-sm">Add</button>`;
         this.buttonHtmlEdit = options.buttonHtmlEdit || `<button type="submit" class="btn btn-info mr-3 btn-sm">Update</button>`;
-        this.buttonHtmlCancel = options.buttonHtmlCancel || (() => {
-            let button = document.createElement('button');
-            button.className += "btn btn-danger btn-sm";
-            button.type = "button";
-            button.addEventListener('click', () => this.setEditData());
-            button.innerText = 'Cancel';
-            return button;
-        });
+        this.buttonHtmlCancel = options.buttonHtmlCancel;
         this.buttonLoadingHtml = options.buttonLoadingHtml || `Working . . .`;
         this.buttonLoadMoreHtml = options.buttonLoadMoreHtml || `<button class="btn btn-primary px-2 py-1 text-center"><i class="fas fa-hand-point-up mr-1"></i> Load New . . .</button>`;
         this.buttonLoadMoreLoadingHtml = options.buttonLoadMoreLoadingHtml || `<i class="spinner-border spinner-border-sm"></i> Fetching . . .`;
@@ -88,6 +83,10 @@ class Infiscroll {
     setToast(options) {
         if (!window.jQuery) {
             console.error('JQuery is Required for Toasts to Initialize!');
+            return false;
+        }
+        if (!window.jQuery.toast && !window.jQuery.fn.toast) {
+            console.error('Bootstrap >=4.2 is Required for Toasts to Initialize!');
             return false;
         }
         if (Array.isArray(options)) {
@@ -165,9 +164,13 @@ class Infiscroll {
         return JSON.parse(data, (key, value) => this.quotesEscape(value, true));
     }
 
-    getTimezoneEquivalentDate(date, serverTimeZone = 180) {
-        date = moment(date);
-        return date.isValid() ? date.subtract(serverTimeZone, 'minutes').add(moment().utcOffset(), 'minutes') : false;
+    getClientTimeFromServerTime(date, serverTimeZone = 0) {
+        if (!window.moment) {
+            console.error('MomentJS is Required to Convert Client Time to Server Time');
+            return false;
+        }
+        date = window.moment(date);
+        return date.isValid() ? date.subtract(serverTimeZone, 'minutes').add(window.moment().utcOffset(), 'minutes') : false;
     }
 
     initScrollAnimation(selector = '.show-on-scroll') {
@@ -232,7 +235,7 @@ class Infiscroll {
         return object ? ajaxObject : $.ajax(ajaxObject);
     }
 
-    createDataTable({table = '#data-table', ajax, columns = [], columnDefs = [], etc = {}, isCrud = true, isServerSide = false, deletableRecords = true, editableRecords = true, deleteMarker = 'suspended'}) {
+    createDataTable({table = '#data-table', form = 'form', ajax, columns = [], columnDefs = [], etc = {}, isCrud = true, isServerSide = false, deletableRecords = true, editableRecords = true, deleteMarker = 'suspended'}) {
         if (!window.jQuery) {
             console.error('JQuery is Required for DataTables to Initialize!');
             return false;
@@ -241,6 +244,7 @@ class Infiscroll {
             this.setToast({message: 'DataTables has NOT been Installed!', type: 'danger'});
             return false;
         }
+        ajax.dataSrc = ajax.dataSrc || ((data) => data);
         $.fn.dataTable.Buttons.defaults.buttons = [];
         $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons d-flex justify-content-md-end ml-2 flex-wrap';
         $.fn.dataTable.ext.classes.sFilter = 'dataTables_filter d-flex align-items-center';
@@ -310,7 +314,11 @@ class Infiscroll {
             const ignored = this.deleteRestore(data);
         });
         $(table).find('tbody').on('click', '.update-button', (event) => {
-            this.setEditData(dataTable.row($(event.currentTarget).closest('tr')).data());
+            const options = {
+                data: dataTable.row($(event.currentTarget).closest('tr')).data(),
+                form
+            };
+            this.setEditData(options);
         });
         return dataTable;
     }
@@ -365,7 +373,7 @@ class Infiscroll {
         this.toggleButton({button, html: this.buttonLoadingHtml});
         let returnValue;
         try {
-            let response = await this.makeAjaxRequest({url, data, hasImages: true, method: 'POST'});
+            let response = await this.makeAjaxRequest({url, data, hasImages: true});
             if (response.ok) {
                 this.setToast({
                     message: successMessage,
@@ -373,7 +381,7 @@ class Infiscroll {
                 });
                 this.setFormErrors();
                 if (dataTable) dataTable.ajax.reload();
-                if (resetForm) this.setEditData();
+                if (resetForm) this.setEditData({form});
                 else $('#button-div').html(this.buttonHtmlEdit);
             } else {
                 this.setFormErrors([response.error]);
@@ -388,9 +396,7 @@ class Infiscroll {
         return returnValue;
     }
 
-    async deleteRestore({
-                            button = 'button', id = 0, suspend = 1, url = '', table = 'table', buttonAllHtml = '', buttonLoadingHtml = '', method = 'DELETE', formData = {}, successMessage = `Record Successfully ${suspend ? 'Suspended' : 'Restored'}.`
-                        } = {}) {
+    async deleteRestore({button = 'button', id = 0, suspend = 1, url = '', table = 'table', buttonAllHtml = '', buttonLoadingHtml = '', method = 'DELETE', formData = {}, successMessage = `Record Successfully ${suspend ? 'Suspended' : 'Restored'}.`} = {}) {
         if (!window.jQuery) {
             console.error('JQuery is Required for deleteRestore function to Work!');
             return false;
@@ -421,7 +427,7 @@ class Infiscroll {
         return response;
     }
 
-    setEditData(data = null, form = 'form', {scrollToTop = true} = {}) {
+    setEditData({data = null, form = 'form', scrollToTop = true} = {}) {
         if (!window.jQuery) {
             console.error('JQuery is Required for setEditData function to Work!');
             return false;
@@ -437,7 +443,14 @@ class Infiscroll {
                 value.innerHTML = value.dataset.edit;
             });
             buttonDiv.html(this.buttonHtmlEdit);
-            buttonDiv.append(this.buttonHtmlCancel)
+            buttonDiv.append(this.buttonHtmlCancel || (() => {
+                let button = document.createElement('button');
+                button.className += "btn btn-danger btn-sm";
+                button.type = "button";
+                button.addEventListener('click', () => this.setEditData({form}));
+                button.innerText = 'Cancel';
+                return button;
+            }));
             for (let item in data) {
                 if (!data.hasOwnProperty(item)) continue;
                 form.find(`input[name=${item}], select[name=${item}], textarea[name=${item}]`)
@@ -477,10 +490,10 @@ class Infiscroll {
         return description;
     }
 
-    quotesEscape(string, reverse = false) {
-        const isTruthyString = string && typeof string === "string";
-        if (reverse) return isTruthyString ? string.replace(/~/g, "'").replace(/`/g, '"') : string;
-        return isTruthyString ? string.replace(/'/g, '~').replace(/"/g, '`') : string;
+    quotesEscape(data, reverse = false) {
+        const isTruthyString = data && typeof data === "string";
+        if (reverse) return isTruthyString ? data.replace(/~/g, "'").replace(/`/g, '"') : data;
+        return isTruthyString ? data.replace(/'/g, '~').replace(/"/g, '`') : data;
     }
 
     afterInfiniteScrollAjax(button = null) {
@@ -512,7 +525,18 @@ class Infiscroll {
  * editAjax
  * deleteRestore
  * setEditData
- * handleAjaxErrorResponse if toast is true
+ * handleAjaxErrorResponse if toast is truthy
+ *
+ * Functions that need bootstrap
+ * setToast
+ * deleteRestore
+ * handleAjaxErrorResponse if toast is truthy
+ *
+ * Functions that depend on data tables
+ * createDataTable
+ * addAjax if dataTable is truthy
+ * editAjax if dataTable is truthy
+ * deleteRestore if table is truthy
  */
 module.exports = Infiscroll;
 global['Infiscroll'] = Infiscroll;

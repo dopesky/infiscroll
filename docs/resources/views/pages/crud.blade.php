@@ -37,7 +37,8 @@
                                                 <span class="input-group-prepend">
                                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                                 </span>
-                                                <input type="text" class="form-control" placeholder="Username . . ." name="username">
+                                                <input type="text" class="form-control" placeholder="Username . . ."
+                                                       name="username">
                                             </label>
                                         </div>
                                         <div class="form-group col-12">
@@ -88,8 +89,8 @@
                     return this.images;
                 },
                 set images(image) {
-                    $('#image-modal .modal-body').html(`<div style="height: 500px;background: url(${image})"
-                class="background-image"></div>`);
+                    $('#image-modal .modal-body')
+                        .html(`<div style="height: 500px;background: url(${image})" class="background-image"></div>`);
                     $('#image-modal').modal('show');
                 }
             },
@@ -167,7 +168,6 @@
                 return infiscrollObject.editAjax({
                     url: "{{route('post.put')}}",
                     dataTable,
-                    method: 'POST',
                     formData: {_method: 'PUT'}
                 });
             }
