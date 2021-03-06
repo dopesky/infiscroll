@@ -73,3 +73,18 @@ jobs:
         run: npm publish -registry=https://npm.pkg.github.com/
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  deploy-docs:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Environment
+        uses: actions/checkout@v2
+
+      - name: Deploy Docs to Heroku
+        uses: akhileshns/heroku-deploy@v3.0.5
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "infiscroll"
+          heroku_email: "oboke69@gmail.com"
+          appdir: "docs"
