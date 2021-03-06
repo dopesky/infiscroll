@@ -1,7 +1,6 @@
 require('@babel/polyfill');
 // TODO: Support Inline Error Messages in Forms
 // TODO: Add Support for Laravel Livewire
-// TODO: Join the common parts of addAjax and editAjax to one function
 class Infiscroll {
     constructor(options = {}) {
         this.validToastTypes = options.validToastTypes || {
@@ -323,11 +322,12 @@ class Infiscroll {
         return dataTable;
     }
 
-    async addAjax({form = 'form', url = '', dataTable = null, formData = {}, successMessage = `Record Successfully Registered.`, resetForm = true}) {
+    async addEditAjax({form = 'form', url = '', dataTable = '', formData = {}, successMessage = null, resetForm = true}) {
         if (!window.jQuery) {
-            console.error('JQuery is Required for addAjax function to Work!');
+            console.error('JQuery is Required for Ajax Enabled Functions to Work!');
             return false;
         }
+        successMessage = successMessage || (infiscrollObject.pageState === 'add' ? 'Record Successfully Registered.' : 'Record Successfully Updated.');
         form = $(form);
         const button = form.find('button[type=submit]');
         let data = new FormData(form[0]);
@@ -338,61 +338,28 @@ class Infiscroll {
         let returnValue;
         try {
             let response = await this.makeAjaxRequest({url, data, hasImages: true});
-            if (response.ok) {
+            let {ok = false, error = "An Unexpected Error Occurred!"} = response;
+            if (ok) {
                 this.setToast({
                     message: successMessage,
                     type: 'success'
                 });
                 this.setFormErrors();
                 if (dataTable) dataTable.ajax.reload();
-                if (resetForm) form[0].reset();
-                else $('#button-div').html(this.buttonHtmlAdd);
+                if (this.pageState === 'add' && resetForm) form[0].reset();
+                if (this.pageState === 'edit' && resetForm) this.setEditData({form});
+                if (this.pageState === 'edit' && !resetForm) this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
             } else {
-                this.setFormErrors([response.error]);
+                this.setFormErrors([error]);
+                if (this.pageState === 'edit') this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
             }
             returnValue = response;
         } catch (response) {
             this.handleAjaxErrorResponse(response);
             returnValue = {ok: false, error: response};
+            if (this.pageState === 'edit') this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
         }
-        this.toggleButton({button, html: $(this.buttonHtmlAdd).html()});
-        return returnValue;
-    }
-
-    async editAjax({form = 'form', url = '', dataTable = null, formData = {}, successMessage = `Record Successfully Updated.`, resetForm = true}) {
-        if (!window.jQuery) {
-            console.error('JQuery is Required for editAjax function to Work!');
-            return false;
-        }
-        form = $(form);
-        const button = form.find('button[type=submit]');
-        let data = new FormData(form[0]);
-        Object.keys(formData).forEach(key => {
-            data.append(key, formData[key]);
-        });
-        this.toggleButton({button, html: this.buttonLoadingHtml});
-        let returnValue;
-        try {
-            let response = await this.makeAjaxRequest({url, data, hasImages: true});
-            if (response.ok) {
-                this.setToast({
-                    message: successMessage,
-                    type: 'success'
-                });
-                this.setFormErrors();
-                if (dataTable) dataTable.ajax.reload();
-                if (resetForm) this.setEditData({form});
-                else $('#button-div').html(this.buttonHtmlEdit);
-            } else {
-                this.setFormErrors([response.error]);
-                this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
-            }
-            returnValue = response;
-        } catch (response) {
-            this.handleAjaxErrorResponse(response);
-            returnValue = {ok: false, error: response};
-            this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
-        }
+        if (this.pageState === 'add') this.toggleButton({button, html: $(this.buttonHtmlAdd).html()});
         return returnValue;
     }
 
@@ -406,7 +373,8 @@ class Infiscroll {
         let response = null;
         try {
             response = await this.makeAjaxRequest({url, data: {...formData, ...(id && {id})}, method});
-            if (response.ok) {
+            let {ok = false, error = "An Unexpected Error Occurred!"} = response;
+            if (ok) {
                 this.setToast({
                     message: successMessage,
                     type: 'success'
@@ -414,7 +382,7 @@ class Infiscroll {
                 if (table) new $.fn.dataTable.Api(table).ajax.reload();
             } else {
                 this.setToast({
-                    message: `${response.error}`,
+                    message: `${error}`,
                     type: 'danger'
                 });
                 this.toggleButton({button, html: buttonHtml});

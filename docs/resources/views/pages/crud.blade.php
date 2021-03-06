@@ -162,15 +162,11 @@
 
         function add_or_edit(event) {
             event.preventDefault();
-            if (infiscrollObject.pageState === 'add') {
-                return infiscrollObject.addAjax({url: "{{route('post.post')}}", dataTable});
-            } else {
-                return infiscrollObject.editAjax({
-                    url: "{{route('post.put')}}",
-                    dataTable,
-                    formData: {_method: 'PUT'}
-                });
-            }
+            infiscrollObject.addEditAjax({
+                url: infiscrollObject.pageState === 'add' ? "{{route('post.post')}}" : "{{route('post.put')}}",
+                dataTable,
+                formData: {...(infiscrollObject.pageState === 'edit' && {_method: 'PUT'})},
+            });
         }
     </script>
 @endpush
