@@ -14,12 +14,12 @@ const jsCompiler = () => {
     return browserify({
         entries: ['./src/js/infiscroll.js'],
         transform: [babelify]
-    }).bundle().pipe(source('infiscroll.js')).pipe(buffer()).pipe(jsMinify()).pipe(dest('./dist/js'));
+    }).bundle().pipe(source('infiscroll.js')).pipe(buffer()).pipe(jsMinify()).pipe(dest('./dist/js')).pipe(dest('./docs/public/js'));
 };
 
 sassCompiler = () => {
     return src('./src/sass/infiscroll.scss').pipe(sass({outputStyle: 'compressed'})
-        .on('error', sass.logError)).pipe(dest('./dist/css'));
+        .on('error', sass.logError)).pipe(dest('./dist/css')).pipe(dest('./docs/public/css'));
 };
 
 task('compileJS', () => {
@@ -34,7 +34,7 @@ task('default', () => {
     browserSync.init({proxy: 'localhost/Html/InfiScroll/docs/', baseDir: './', open: false});
     watch('./src/sass/infiscroll.scss', {ignoreInitial: false}, parallel('compileSass'));
     watch('./src/js/infiscroll.js', {ignoreInitial: false}, parallel('compileJS'));
-    watch('./docs/**/*.php').on('change', browserSync.reload);
+    watch(['./docs/**/*.php', 'README.md']).on('change', browserSync.reload);
 });
 
 task('deploy', () => {
