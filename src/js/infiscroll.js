@@ -421,8 +421,14 @@ class Infiscroll {
             }));
             for (let item in data) {
                 if (!data.hasOwnProperty(item)) continue;
-                form.find(`input[name=${item}], select[name=${item}], textarea[name=${item}]`)
+                form.find(`input[name=${item}]:not([type=radio]):not([type=checkbox]), select[name=${item}], textarea[name=${item}]`)
                     .not('.ignore').val(data[item]);
+                let checkboxes = form.find(`input[name=${item}][type=checkbox], input[name=${item}][type=radio]`).not('.ignore');
+                if (data[item] === true || data[item] === false) {
+                    if (checkboxes.length > 0) checkboxes[0].checked = data[item];
+                } else {
+                    for (let i = 0; i < checkboxes.length; i++) checkboxes[i].checked = checkboxes[i].value === data[item];
+                }
             }
             if (scrollToTop) $('body, html').animate({scrollTop: 0});
         } else {
