@@ -77,6 +77,10 @@ class Infiscroll {
         this.pageState = options.pageState || 'add';
         this.setEditDataPreProcess = options.setEditDataPreProcess || (() => true);
         this.setEditDataPostProcess = options.setEditDataPostProcess || (() => true);
+        this.pageTitlesSelector = options.pageTitlesSelector || '.page-title';
+        this.buttonDiv = $(options.buttonDiv || '#button-div');
+        this.formErrorContainer = options.formErrorContainer || null;
+        this.scrollToTopElement = options.scrollToTopElement || 'body, html';
     }
 
     setToast(options) {
@@ -120,7 +124,12 @@ class Infiscroll {
             }
             return response;
         }
-        let {button, html = '<p>No Html Set!</p>', removeClassesOnDisabled = '', addClassesOnDisabled = 'disabled'} = options;
+        let {
+            button,
+            html = '<p>No Html Set!</p>',
+            removeClassesOnDisabled = '',
+            addClassesOnDisabled = 'disabled'
+        } = options;
         if (!button) return false;
         const disabled = !$(button).attr('disabled');
         const removeClass = disabled ? removeClassesOnDisabled : addClassesOnDisabled;
@@ -134,15 +143,19 @@ class Infiscroll {
     }
 
     setFormErrors(errors = null) {
-        const container = document.getElementById('form-errors-container');
-        const errorsDiv = document.getElementById('form-errors');
-        if (!container || !errorsDiv) return false;
+        const {
+            containerSelector = '#form-errors-container',
+            errorsDivSelector = '#form-errors'
+        } = this.formErrorContainer || {};
+        const container = document.querySelectorAll(containerSelector);
+        const errorsDiv = document.querySelectorAll(errorsDivSelector);
+        if (container.length < 1 || errorsDiv.length < 1) return false;
         errors = Array.isArray(errors) ? errors.map(error => `<p>${error}</p>`).join('') : errors;
         if (errors) {
-            container.classList.remove('d-none');
-            errorsDiv.innerHTML = errors;
+            container.forEach(item => item.classList.remove('d-none'));
+            errorsDiv.forEach(item => item.innerHTML = errors);
         } else {
-            container.classList.add('d-none');
+            container.forEach(item => item.classList.add('d-none'));
         }
         return !!errors;
     }
@@ -243,7 +256,7 @@ class Infiscroll {
             this.setToast({message: 'DataTables has NOT been Installed!', type: 'danger'});
             return false;
         }
-        ajax.dataSrc = ajax.dataSrc || ((data) => data);
+        if (isCrud && ajax) ajax.dataSrc = ajax.dataSrc || ((data) => data);
         $.fn.dataTable.Buttons.defaults.buttons = [];
         $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons d-flex justify-content-md-end ml-2 flex-wrap';
         $.fn.dataTable.ext.classes.sFilter = 'dataTables_filter d-flex align-items-center';
@@ -269,7 +282,7 @@ class Infiscroll {
             },
             responsive: true,
             autoWidth: true,
-            ...(isCrud && {ajax}),
+            ...(isCrud && ajax && {ajax}),
             ...(isCrud && {columns}),
             columnDefs: [
                 ...columnDefs,
@@ -327,7 +340,7 @@ class Infiscroll {
             console.error('JQuery is Required for Ajax Enabled Functions to Work!');
             return false;
         }
-        successMessage = successMessage || (infiscrollObject.pageState === 'add' ? 'Record Successfully Registered.' : 'Record Successfully Updated.');
+        successMessage = successMessage || (this.pageState === 'add' ? 'Record Successfully Registered.' : 'Record Successfully Updated.');
         form = $(form);
         const button = form.find('button[type=submit]');
         let data = new FormData(form[0]);
@@ -348,7 +361,10 @@ class Infiscroll {
                 if (dataTable) dataTable.ajax.reload();
                 if (this.pageState === 'add' && resetForm) form[0].reset();
                 if (this.pageState === 'edit' && resetForm) this.setEditData({form});
-                if (this.pageState === 'edit' && !resetForm) this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
+                if (this.pageState === 'edit' && !resetForm) this.toggleButton({
+                    button,
+                    html: $(this.buttonHtmlEdit).html()
+                });
             } else {
                 this.setFormErrors([error]);
                 if (this.pageState === 'edit') this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
@@ -403,15 +419,14 @@ class Infiscroll {
         this.setFormErrors();
         form = $(form);
         this.pageState = data ? 'edit' : 'add';
-        let pageTitles = document.querySelectorAll('.page-title');
-        let buttonDiv = $('#button-div');
+        let pageTitles = document.querySelectorAll(this.pageTitlesSelector);
         this.setEditDataPreProcess(data, this.pageState);
         if (data) {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.edit;
             });
-            buttonDiv.html(this.buttonHtmlEdit);
-            buttonDiv.append(this.buttonHtmlCancel || (() => {
+            this.buttonDiv.html(this.buttonHtmlEdit);
+            this.buttonDiv.append(this.buttonHtmlCancel || (() => {
                 let button = document.createElement('button');
                 button.className += "btn btn-danger btn-sm";
                 button.type = "button";
@@ -430,12 +445,12 @@ class Infiscroll {
                     for (let i = 0; i < checkboxes.length; i++) checkboxes[i].checked = checkboxes[i].value === data[item];
                 }
             }
-            if (scrollToTop) $('body, html').animate({scrollTop: 0});
+            if (scrollToTop) $(this.scrollToTopElement).animate({scrollTop: 0});
         } else {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.add;
             });
-            buttonDiv.html(this.buttonHtmlAdd);
+            this.buttonDiv.html(this.buttonHtmlAdd);
             form[0].reset();
         }
         this.setEditDataPostProcess(data, this.pageState);
