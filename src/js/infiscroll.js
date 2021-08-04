@@ -1,79 +1,98 @@
-// TODO: In next major release, make this a class.
-let infiscroll = {
-    validToastTypes: {
-        success: `<strong><i class="fa fa-check-circle"></i> Success: </strong>`,
-        danger: `<strong><i class="fa fa-times-circle"></i> Error: </strong>`,
-        info: `<strong><i class="fa fa-info-circle"></i> Info: </strong>`,
-        warning: `<strong><i class="fa fa-exclamation-circle"></i> Warning: </strong>`
-    },
-    infiniteScrollObject: {
-        ajax: {},
-        hasMoreItems: true,
-        newItems: 0,
-        size: -1,
-        offset: 0,
-        fetching: false,
-    },
-    revealOnScrollObserver: new IntersectionObserver(function (entries, observer) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const revealElement = entry.target;
-                const loopInfinitely = revealElement.dataset.infinite ? revealElement.dataset.infinite.toLowerCase().trim() : 'true';
-                revealElement.classList.add("is-visible");
-                if (!loopInfinitely || loopInfinitely === 'false') {
-                    observer.unobserve(revealElement);
-                }
-            } else {
-                entry.target.classList.remove("is-visible");
-            }
-        });
-    }),
-    lazyImageObserver: new IntersectionObserver(function (entries, observer) {
-        entries.forEach(function (entry) {
-            // TODO: Support video and picture tags
-            if (entry.isIntersecting) {
-                const lazyImage = entry.target;
-                const tagName = lazyImage.tagName.toLowerCase().trim();
-                if (tagName === 'img') {
-                    lazyImage.src = lazyImage.dataset.src;
-                    if (lazyImage.dataset.hasOwnProperty('srcset')) lazyImage.srcset = lazyImage.dataset.srcset;
+require('@babel/polyfill');
+// TODO: Support Inline Error Messages in Forms
+// TODO: Add Support for Laravel Livewire
+// TODO: Support Show confirmation modal in delete/restore and support unrestorable deletions
+class Infiscroll {
+    constructor(options = {}) {
+        this.validToastTypes = options.validToastTypes || {
+            success: `<strong><i class="fas fa-check-circle"></i> Success: </strong>`,
+            danger: `<strong><i class="fas fa-times-circle"></i> Error: </strong>`,
+            info: `<strong><i class="fas fa-info-circle"></i> Info: </strong>`,
+            warning: `<strong><i class="fas fa-exclamation-circle"></i> Warning: </strong>`
+        };
+        this.infiniteScrollObject = options.infiniteScrollObject || {
+            ajax: {},
+            hasMoreItems: true,
+            newItems: 0,
+            size: -1,
+            offset: 0,
+            fetching: false,
+        };
+        this.revealOnScrollObserver = options.revealOnScrollObserver || new IntersectionObserver(function (entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const revealElement = entry.target;
+                    const loopInfinitely = revealElement.dataset.infinite ? revealElement.dataset.infinite.toLowerCase().trim() : 'true';
+                    revealElement.classList.add("is-visible");
+                    if (!loopInfinitely || loopInfinitely === 'false') {
+                        observer.unobserve(revealElement);
+                    }
                 } else {
-                    lazyImage.style.background = `url(${lazyImage.dataset.src})`;
+                    entry.target.classList.remove("is-visible");
                 }
-                observer.unobserve(lazyImage);
-            }
+            });
         });
-    }),
-    infiniteScrollObserver: new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting && !infiscroll.infiniteScrollObject.fetching) {
-                infiscroll.afterInfiniteScrollAjax().then(({hasMoreItems, newItems}) => {
-                    if (parseInt(newItems)) {
-                        $('#show-more').removeClass('d-none');
+        this.lazyImageObserver = options.lazyImageObserver || new IntersectionObserver(function (entries, observer) {
+            entries.forEach(function (entry) {
+                // TODO: Support video and picture tags
+                if (entry.isIntersecting) {
+                    const lazyImage = entry.target;
+                    const tagName = lazyImage.tagName.toLowerCase().trim();
+                    if (tagName === 'img') {
+                        lazyImage.src = lazyImage.dataset.src;
+                        if (lazyImage.dataset.hasOwnProperty('srcset')) lazyImage.srcset = lazyImage.dataset.srcset;
+                    } else {
+                        lazyImage.style.background = `url(${lazyImage.dataset.src})`;
                     }
-                    if (!hasMoreItems && hasMoreItems !== null) {
-                        infiscroll.infiniteScrollObserver.unobserve(entry.target);
-                        entry.target.classList.add('d-none');
-                    }
-                });
-            }
+                    observer.unobserve(lazyImage);
+                }
+            });
         });
-    }, {rootMargin: '0% 0% 100% 0%'}),
-    dataTableEditButton: `<i class="fas fa-edit"></i> <span class="d-none d-xl-inline">Edit</span>`,
-    dataTableRestoreButton: `<i class="fas fa-check-circle"></i> <span class="d-none d-xl-inline">Restore</span>`,
-    dataTableDeleteButton: `<i class="fas fa-times-circle"></i> <span class="d-none d-xl-inline">Delete</span>`,
-    dataTableButtonLoadingHtml: `<span class="fa fa-spin fa-spinner"></span> <span class="d-none d-xl-inline"> Working</span>`,
-    dataTableNonEditableHtml: ``,
-    dataTableNonDeletableHtml: ``,
-    buttonHtmlAdd: `<button type="submit" class="btn btn-success btn-sm">Add</button>`,
-    buttonHtmlEdit: `<button type="submit" class="btn btn-info mr-3 btn-sm">Update</button>`,
-    buttonHtmlCancel: `<button type="button" onclick="infiscroll.setEditData()" class="btn btn-danger btn-sm">Cancel</button>`,
-    buttonLoadingHtml: `Working . . .`,
-    buttonLoadMoreHtml: `<button class="btn btn-primary px-2 py-1 text-center"><i class="fas fa-hand-point-up mr-1"></i> Load New . . .</button>`,
-    buttonLoadMoreLoadingHtml: `<i class="spinner-border spinner-border-sm"></i> Fetching . . .`,
-    pageState: 'add',
+        this.infiniteScrollObserver = options.infiniteScrollObserver || new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting && !this.infiniteScrollObject.fetching) {
+                    this.afterInfiniteScrollAjax().then(({hasMoreItems, newItems}) => {
+                        if (parseInt(newItems)) {
+                            document.getElementById('show-more').classList.remove('d-none');
+                        }
+                        if (!hasMoreItems && hasMoreItems !== null) {
+                            this.infiniteScrollObserver.unobserve(entry.target);
+                            entry.target.classList.add('d-none');
+                        }
+                    });
+                }
+            });
+        }, {rootMargin: '0% 0% 100% 0%'});
+        this.dataTableEditButton = options.dataTableEditButton || `<i class="fas fa-edit"></i> <span class="d-none d-xl-inline">Edit</span>`;
+        this.dataTableRestoreButton = options.dataTableRestoreButton || `<i class="fas fa-check-circle"></i> <span class="d-none d-xl-inline">Restore</span>`;
+        this.dataTableDeleteButton = options.dataTableDeleteButton || `<i class="fas fa-times-circle"></i> <span class="d-none d-xl-inline">Delete</span>`;
+        this.dataTableButtonLoadingHtml = options.dataTableButtonLoadingHtml || `<span class="fas fa-spin fa-spinner"></span> <span class="d-none d-xl-inline"> Working</span>`;
+        this.dataTableNonEditableHtml = options.dataTableNonEditableHtml || ``;
+        this.dataTableNonDeletableHtml = options.dataTableNonDeletableHtml || ``;
+        this.buttonHtmlAdd = options.buttonHtmlAdd || `<button type="submit" class="btn btn-success btn-sm">Add</button>`;
+        this.buttonHtmlEdit = options.buttonHtmlEdit || `<button type="submit" class="btn btn-info mr-3 btn-sm">Update</button>`;
+        this.buttonHtmlCancel = options.buttonHtmlCancel;
+        this.buttonLoadingHtml = options.buttonLoadingHtml || `Working . . .`;
+        this.buttonLoadMoreHtml = options.buttonLoadMoreHtml || `<button class="btn btn-primary px-2 py-1 text-center"><i class="fas fa-hand-point-up mr-1"></i> Load New . . .</button>`;
+        this.buttonLoadMoreLoadingHtml = options.buttonLoadMoreLoadingHtml || `<i class="spinner-border spinner-border-sm"></i> Fetching . . .`;
+        this.pageState = options.pageState || 'add';
+        this.setEditDataPreProcess = options.setEditDataPreProcess || (() => true);
+        this.setEditDataPostProcess = options.setEditDataPostProcess || (() => true);
+        this.pageTitlesSelector = options.pageTitlesSelector || '.page-title';
+        this.buttonDiv =options.buttonDiv || '#button-div';
+        this.formErrorContainer = options.formErrorContainer || null;
+        this.scrollToTopElement = options.scrollToTopElement || 'body, html';
+    }
 
-    setToast: function (options) {
+    setToast(options) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for Toasts to Initialize!');
+            return false;
+        }
+        if (!window.jQuery.toast && !window.jQuery.fn.toast) {
+            console.error('Bootstrap >=4.2 is Required for Toasts to Initialize!');
+            return false;
+        }
         if (Array.isArray(options)) {
             let response = !!options.length;
             for (let option of options) {
@@ -92,9 +111,13 @@ let infiscroll = {
         const html = `<div class="toast ${classes}" role="alert" aria-live="assertive" aria-atomic="true" data-delay="${delay}"
         data-toggle="toast"><div class='toast-body alert alert-${type} mb-0'>${this.validToastTypes[type]} ${message}</div></div>`;
         return element.append(html).find('.toast:not(.hide,.show)').toast('show');
-    },
+    }
 
-    toggleButton: function (options) {
+    toggleButton(options) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for Button Toggle to Work!');
+            return false;
+        }
         if (Array.isArray(options)) {
             let response = !!options.length;
             for (let option of options) {
@@ -102,7 +125,12 @@ let infiscroll = {
             }
             return response;
         }
-        let {button, html = '<p>No Html Set!</p>', removeClassesOnDisabled = '', addClassesOnDisabled = 'disabled'} = options;
+        let {
+            button,
+            html = '<p>No Html Set!</p>',
+            removeClassesOnDisabled = '',
+            addClassesOnDisabled = 'disabled'
+        } = options;
         if (!button) return false;
         const disabled = !$(button).attr('disabled');
         const removeClass = disabled ? removeClassesOnDisabled : addClassesOnDisabled;
@@ -113,59 +141,72 @@ let infiscroll = {
             .addClass(addClass)
             .html(html);
         return true;
-    },
+    }
 
-    setFormErrors: function (errors = null) {
-        const container = $('#form-errors-container');
-        const errorsDiv = $('#form-errors');
+    setFormErrors(errors = null) {
+        const {
+            containerSelector = '#form-errors-container',
+            errorsDivSelector = '#form-errors'
+        } = this.formErrorContainer || {};
+        const container = document.querySelectorAll(containerSelector);
+        const errorsDiv = document.querySelectorAll(errorsDivSelector);
+        if (container.length < 1 || errorsDiv.length < 1) return false;
         errors = Array.isArray(errors) ? errors.map(error => `<p>${error}</p>`).join('') : errors;
         if (errors) {
-            container.removeClass('d-none');
-            errorsDiv.html(errors);
+            container.forEach(item => item.classList.remove('d-none'));
+            errorsDiv.forEach(item => item.innerHTML = errors);
         } else {
-            container.addClass('d-none');
+            container.forEach(item => item.classList.add('d-none'));
         }
         return !!errors;
-    },
+    }
 
-    capitalize: function (word, locale = navigator.language) {
+    capitalize(word, locale = navigator.language) {
         if (!word || !word.trim()) return '';
         return word.trim().split(' ').map(([firstLetter, ...otherLetters]) => {
             return [firstLetter.toLocaleUpperCase(locale), otherLetters.join('').toLocaleLowerCase(locale)].join('');
         }).join(' ');
-    },
+    }
 
-    stringify: function (data) {
+    stringify(data) {
         return JSON.stringify(data, (key, value) => this.quotesEscape(value));
-    },
+    }
 
-    parse: function (data) {
+    parse(data) {
         if (typeof data !== 'string') data = this.stringify(data);
         return JSON.parse(data, (key, value) => this.quotesEscape(value, true));
-    },
+    }
 
-    getTimezoneEquivalentDate: function (date, serverTimeZone = 180) {
-        date = moment(date);
-        return date.isValid() ? date.subtract(serverTimeZone, 'minutes').add(moment().utcOffset(), 'minutes') : false;
-    },
+    getClientTimeFromServerTime(date, serverTimeZone = 0) {
+        if (!window.moment) {
+            console.error('MomentJS is Required to Convert Client Time to Server Time');
+            return false;
+        }
+        date = window.moment(date);
+        return date.isValid() ? date.subtract(serverTimeZone, 'minutes').add(window.moment().utcOffset(), 'minutes') : false;
+    }
 
-    initScrollAnimation: function (selector = '.show-on-scroll') {
+    initScrollAnimation(selector = '.show-on-scroll') {
         const targets = document.querySelectorAll(selector);
         targets.forEach((target) => {
             this.revealOnScrollObserver.observe(target);
         });
         return !!targets.length;
-    },
+    }
 
-    initLazyLoading: function (selector = '.lazy-load') {
+    initLazyLoading(selector = '.lazy-load') {
         const targets = document.querySelectorAll(selector);
         targets.forEach((lazyImage) => {
             this.lazyImageObserver.observe(lazyImage);
         });
         return !!targets.length;
-    },
+    }
 
-    initInfiniteScroll: function (url, successFunction = (data) => data, selector = '#infinite-scroll') {
+    initInfiniteScroll(url, successFunction = (data) => data, selector = '#infinite-scroll') {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for Infinite Scroll to Initialize!');
+            return false;
+        }
         const targets = document.querySelectorAll(selector);
         this.infiniteScrollObject.ajax = {
             ...this.makeAjaxRequest({url, object: true}),
@@ -176,7 +217,7 @@ let infiscroll = {
             $('#show-more').children().on('click', (event) => {
                 this.afterInfiniteScrollAjax(event.target).then(() => {
                     $('body, html').animate({scrollTop: 0}, () => {
-                        $('#show-more').addClass('d-none');
+                        $(event.currentTarget).addClass('d-none');
                     });
                 });
             });
@@ -186,9 +227,13 @@ let infiscroll = {
             this.infiniteScrollObserver.observe(infiniteScrollElement);
         });
         return !!url && !!targets.length;
-    },
+    }
 
-    makeAjaxRequest: function ({url, data = {}, method = 'POST', object = false, hasImages = false}) {
+    makeAjaxRequest({url, data = {}, method = 'POST', object = false, hasImages = false}) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for Ajax Requests');
+            return false;
+        }
         const token = $('meta[name="csrf-token"]').attr('content');
         let ajaxObject = {
             url,
@@ -201,19 +246,20 @@ let infiscroll = {
             ...(hasImages && {processData: false, contentType: false})
         };
         return object ? ajaxObject : $.ajax(ajaxObject);
-    },
+    }
 
-    createDataTable: function ({table = '#data-table', ajax, columns = [], columnDefs = [], etc = {}, isCrud = true, isServerSide = false, deletableRecords = true, editableRecords = true, deleteMarker = 'suspended'}) {
+    createDataTable({table = '#data-table', form = 'form', ajax, columns = [], columnDefs = [], etc = {}, isCrud = true, isServerSide = false, deletableRecords = true, editableRecords = true, deleteMarker = 'suspended'}) {
         if (!window.jQuery) {
-            this.setToast({message: 'JQuery is Required for DataTables to Initialize!', type: 'danger'});
+            console.error('JQuery is Required for DataTables to Initialize!');
             return false;
         }
         if (!window.jQuery.fn.dataTable) {
             this.setToast({message: 'DataTables has NOT been Installed!', type: 'danger'});
             return false;
         }
-        $.fn.dataTable.Buttons.defaults.buttons = [];
-        $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons d-flex justify-content-md-end ml-2 flex-wrap';
+        if (isCrud && ajax) ajax.dataSrc = ajax.dataSrc || ((data) => data);
+        if ($.fn.dataTable.Buttons) $.fn.dataTable.Buttons.defaults.buttons = [];
+        if ($.fn.dataTable.Buttons) $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons d-flex justify-content-md-end ml-2 flex-wrap';
         $.fn.dataTable.ext.classes.sFilter = 'dataTables_filter d-flex align-items-center';
         $.fn.dataTable.ext.classes.sPageButton = 'page-item dataTables-pagination-list-item';
         $.fn.dataTable.ext.classes.sProcessing = "dataTables_processing card";
@@ -237,7 +283,7 @@ let infiscroll = {
             },
             responsive: true,
             autoWidth: true,
-            ...(isCrud && {ajax}),
+            ...(isCrud && ajax && {ajax}),
             ...(isCrud && {columns}),
             columnDefs: [
                 ...columnDefs,
@@ -248,18 +294,15 @@ let infiscroll = {
                         searchable: false,
                         class: 'text-center',
                         render: (data, type, full) => {
-                            if (!full.hasOwnProperty(deleteMarker)) return data;
-                            const {url, deleteURL} = ajax;
-                            const restoreButton = `<button onclick="infiscroll.deleteRestore(this, ${data}, 0, '${deleteURL || url}', '${table}')" 
-                                class='btn btn-sm btn-success' title='Restore'>${this.dataTableRestoreButton}</button>`;
-                            const deleteButton = `<button onclick="infiscroll.deleteRestore(this, ${data}, 1, '${deleteURL || url}', '${table}')" 
-                                class='btn btn-sm btn-danger' title='Delete'>${this.dataTableDeleteButton}</button>`;
-                            const editButton = editableRecords && (!full.hasOwnProperty('editable') || full.editable) ?
-                                `<button onclick='infiscroll.setEditData(${this.stringify(full)})' 
-                                class='btn btn-sm btn-info' title='Edit'>${this.dataTableEditButton}</button>` : this.dataTableNonEditableHtml;
+                            const restoreButton = `<button data-id="${data}" data-suspend="0" class='btn btn-sm btn-success delete-restore-button' 
+                               title='Restore'>${this.dataTableRestoreButton}</button>`;
+                            const deleteButton = `<button data-id="${data}" data-suspend="1" class='btn btn-sm btn-danger delete-restore-button' 
+                                title='Delete'>${this.dataTableDeleteButton}</button>`;
+                            const editButton = `<button class='btn btn-sm btn-info update-button' title='Edit'>${this.dataTableEditButton}</button>`;
                             return `<div class='d-flex align-items-center
-                                justify-content-${deletableRecords && editableRecords ? 'around' : 'center'}'>${editButton}
-                                ${deletableRecords && (!full.hasOwnProperty('deletable') || full.deletable) ? (full[deleteMarker] ? restoreButton : deleteButton) : this.dataTableNonDeletableHtml}</div>`;
+                                justify-content-${deletableRecords && editableRecords ? 'around' : 'center'}'>
+                                ${editableRecords && (!full.hasOwnProperty('editable') || full.editable) ? editButton : this.dataTableNonEditableHtml}
+                                ${deletableRecords && (!full.hasOwnProperty('deletable') || full.deletable) ? (!full.hasOwnProperty(deleteMarker) ? data : (full[deleteMarker] ? restoreButton : deleteButton)) : this.dataTableNonDeletableHtml}</div>`;
                         },
                     })
                 }
@@ -270,81 +313,85 @@ let infiscroll = {
             }),
             ...etc,
         };
-        return $(table).DataTable(options);
-    },
+        let dataTable = $(table).DataTable(options);
+        $(table).find('tbody').on('click', '.delete-restore-button', (event) => {
+            const {url, deleteURL} = ajax;
+            let data = {
+                button: event.currentTarget,
+                id: $(event.currentTarget).data('id'),
+                url: deleteURL || url,
+                suspend: $(event.currentTarget).data('suspend'),
+                table
+            };
+            const ignored = this.deleteRestore(data);
+        });
+        $(table).find('tbody').on('click', '.update-button', (event) => {
+            const options = {
+                data: dataTable.row($(event.currentTarget).closest('tr')).data(),
+                form
+            };
+            this.setEditData(options);
+        });
+        return dataTable;
+    }
 
-    addAjax: async function ({form = 'form', url = '', dataTable = null, formData = {}, successMessage = `Record Successfully Registered.`, resetForm = true}) {
+    async addEditAjax({form = 'form', url = '', dataTable = '', formData = {}, successMessage = null, resetForm = true}) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for Ajax Enabled Functions to Work!');
+            return false;
+        }
+        successMessage = successMessage || (this.pageState === 'add' ? 'Record Successfully Registered.' : 'Record Successfully Updated.');
         form = $(form);
         const button = form.find('button[type=submit]');
         let data = new FormData(form[0]);
         Object.keys(formData).forEach(key => {
             data.append(key, formData[key]);
-        })
+        });
         this.toggleButton({button, html: this.buttonLoadingHtml});
         let returnValue;
         try {
             let response = await this.makeAjaxRequest({url, data, hasImages: true});
-            if (response.ok) {
+            let {ok = false, error = "An Unexpected Error Occurred!"} = response;
+            if (ok) {
                 this.setToast({
                     message: successMessage,
                     type: 'success'
                 });
                 this.setFormErrors();
                 if (dataTable) dataTable.ajax.reload();
-                if (resetForm) form[0].reset();
-            } else {
-                this.setFormErrors([response.error]);
-            }
-            returnValue = response;
-        } catch (response) {
-            this.handleAjaxErrorResponse(response);
-            returnValue = {ok: false, error: response};
-        }
-        this.toggleButton({button, html: $(this.buttonHtmlAdd).html()});
-        return returnValue;
-    },
-
-    editAjax: async function ({form = 'form', url = '', dataTable = null, formData = {}, successMessage = `Record Successfully Updated.`, resetForm = true}) {
-        form = $(form);
-        const button = form.find('button[type=submit]');
-        let data = new FormData(form[0]);
-        Object.keys(formData).forEach(key => {
-            data.append(key, formData[key]);
-        })
-        this.toggleButton({button, html: this.buttonLoadingHtml});
-        let returnValue;
-        try {
-            let response = await this.makeAjaxRequest({url, data, hasImages: true, method: 'POST'});
-            if (response.ok) {
-                this.setToast({
-                    message: successMessage,
-                    type: 'success'
+                if (this.pageState === 'add' && resetForm) this.resetForm({form});
+                if (this.pageState === 'edit' && resetForm) this.setEditData({form});
+                if (this.pageState === 'edit' && !resetForm) this.toggleButton({
+                    button,
+                    html: $(this.buttonHtmlEdit).html()
                 });
-                this.setFormErrors();
-                if (dataTable) dataTable.ajax.reload();
-                if (resetForm) this.setEditData();
             } else {
-                this.setFormErrors([response.error]);
-                this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
+                this.setFormErrors([error]);
+                if (this.pageState === 'edit') this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
             }
             returnValue = response;
         } catch (response) {
             this.handleAjaxErrorResponse(response);
             returnValue = {ok: false, error: response};
-            this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
+            if (this.pageState === 'edit') this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
         }
+        if (this.pageState === 'add') this.toggleButton({button, html: $(this.buttonHtmlAdd).html()});
+        $(dataTable || this.scrollToTopElement).animate({scrollTop: 0});
         return returnValue;
-    },
+    }
 
-    deleteRestore: async function (button, id, suspend, url, table, {
-        buttonAllHtml = '', buttonLoadingHtml = '', method = 'DELETE', formData = {}, successMessage = `Record Successfully ${suspend ? 'Suspended' : 'Restored'}.`
-    } = {}) {
+    async deleteRestore({button = 'button', id = 0, suspend = 1, url = '', table = 'table', buttonAllHtml = '', buttonLoadingHtml = '', method = 'DELETE', formData = {}, successMessage = `Record Successfully ${suspend ? 'Suspended' : 'Restored'}.`} = {}) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for deleteRestore function to Work!');
+            return false;
+        }
         const buttonHtml = buttonAllHtml || (suspend ? this.dataTableDeleteButton : this.dataTableRestoreButton);
         this.toggleButton({button, html: buttonLoadingHtml || this.dataTableButtonLoadingHtml});
         let response = null;
         try {
-            response = await this.makeAjaxRequest({url, data: {...formData, id}, method});
-            if (response.ok) {
+            response = await this.makeAjaxRequest({url, data: {...formData, ...(id && {id})}, method});
+            let {ok = false, error = "An Unexpected Error Occurred!"} = response;
+            if (ok) {
                 this.setToast({
                     message: successMessage,
                     type: 'success'
@@ -352,80 +399,105 @@ let infiscroll = {
                 if (table) new $.fn.dataTable.Api(table).ajax.reload();
             } else {
                 this.setToast({
-                    message: `${response.error}`,
+                    message: `${error}`,
                     type: 'danger'
                 });
                 this.toggleButton({button, html: buttonHtml});
             }
         } catch (errorObject) {
             response = errorObject;
-            this.handleAjaxErrorResponse(errorObject);
+            this.handleAjaxErrorResponse(errorObject, true);
             this.toggleButton({button, html: buttonHtml});
         }
         return response;
-    },
+    }
 
-    setEditData: function (data = null, form = 'form', {scrollToTop = true} = {}) {
+    setEditData({data = null, form = 'form', scrollToTop = true} = {}) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for setEditData function to Work!');
+            return false;
+        }
         this.setFormErrors();
         form = $(form);
         this.pageState = data ? 'edit' : 'add';
-        let pageTitles = document.querySelectorAll('.page-title');
-        let buttonDiv = $('#button-div');
-        data = data ? this.parse(data) : data;
+        let pageTitles = document.querySelectorAll(this.pageTitlesSelector);
         this.setEditDataPreProcess(data, this.pageState);
         if (data) {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.edit;
             });
-            buttonDiv.html(this.buttonHtmlEdit + this.buttonHtmlCancel);
+            $(this.buttonDiv).html(this.buttonHtmlEdit);
+            $(this.buttonDiv).append(this.buttonHtmlCancel || (() => {
+                let button = document.createElement('button');
+                button.className += "btn btn-danger btn-sm";
+                button.type = "button";
+                button.addEventListener('click', () => this.setEditData({form}));
+                button.innerText = 'Cancel';
+                return button;
+            }));
             for (let item in data) {
                 if (!data.hasOwnProperty(item)) continue;
-                form.find(`input[name=${item}], select[name=${item}], textarea[name=${item}]`)
+                form.find(`input[name=${item}]:not([type=radio]):not([type=checkbox]), select[name=${item}], textarea[name=${item}]`)
                     .not('.ignore').val(data[item]);
+                let checkboxes = form.find(`input[name=${item}][type=checkbox], input[name=${item}][type=radio]`).not('.ignore');
+                if (data[item] === true || data[item] === false) {
+                    if (checkboxes.length > 0) checkboxes[0].checked = data[item];
+                } else {
+                    for (let i = 0; i < checkboxes.length; i++) checkboxes[i].checked = checkboxes[i].value === data[item];
+                }
             }
-            if (scrollToTop) $('body, html').animate({scrollTop: 0});
         } else {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.add;
             });
-            buttonDiv.html(this.buttonHtmlAdd);
-            form[0].reset();
+            $(this.buttonDiv).html(this.buttonHtmlAdd);
+            this.resetForm({form});
         }
+        if (scrollToTop) $(this.scrollToTopElement).animate({scrollTop: 0});
         this.setEditDataPostProcess(data, this.pageState);
         return this.pageState;
-    },
+    }
 
-    setEditDataPreProcess: () => true,
+    resetForm({form = '#form'} = {}) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for resetForm function to Work!');
+            return false;
+        }
+        form = $(form);
+        form[0].reset();
+        form.find('select,input,textarea').trigger('change');
+        return true;
+    }
 
-    setEditDataPostProcess: () => true,
-
-    // TODO: find a way to override the form errors and support toasts too
-    handleAjaxErrorResponse: function (response, logErrors = true) {
+    handleAjaxErrorResponse(response, toast = false, logErrors = true) {
         let description = '';
         if (response.status === 403) {
-            this.setFormErrors(['You do not have Enough Rights to Perform that Action.']);
+            const message = ['You do not have Enough Rights to Perform that Action.'];
+            if (toast) this.setToast({message, type: 'danger'});
+            else this.setFormErrors(message);
             description = 'Forbidden';
         } else if (response.status === 422) {
             let errorKeys = Object.keys(response.responseJSON.errors);
             if (Array.isArray(errorKeys)) {
-                let errors = errorKeys.map((key) => {
+                let message = errorKeys.map((key) => {
                     return response.responseJSON.errors[key].map(item => `<p>${item}</p>`).join('');
                 });
-                this.setFormErrors(errors);
+                if (toast) this.setToast({message, type: 'danger'});
+                else this.setFormErrors(message);
             }
             description = 'Unprocessed Entity';
         }
         if (logErrors) console.log(response);
         return description;
-    },
+    }
 
-    quotesEscape: function (string, reverse = false) {
-        const isTruthyString = string && typeof string === "string";
-        if (reverse) return isTruthyString ? string.replace(/~/g, "'").replace(/`/g, '"') : string;
-        return isTruthyString ? string.replace(/'/g, '~').replace(/"/g, '`') : string;
-    },
+    quotesEscape(data, reverse = false) {
+        const isTruthyString = data && typeof data === "string";
+        if (reverse) return isTruthyString ? data.replace(/~/g, "'").replace(/`/g, '"') : data;
+        return isTruthyString ? data.replace(/'/g, '~').replace(/"/g, '`') : data;
+    }
 
-    afterInfiniteScrollAjax: function (button = null) {
+    afterInfiniteScrollAjax(button = null) {
         const {ajax, newItems, hasMoreItems, offset, size} = this.infiniteScrollObject;
         if (!ajax.url || !ajax.hasOwnProperty('data')) return Promise.resolve(false);
         ajax.data = {...ajax.data, newItems, hasMoreItems, offset, size, ...(button && {loadNewItems: true})};
@@ -440,8 +512,32 @@ let infiscroll = {
             this.infiniteScrollObject.size = parseInt(size);
             return {hasMoreItems: this.infiniteScrollObject.hasMoreItems, newItems, offset, size};
         });
-    },
-};
+    }
+}
 
-module.exports = {infiscroll};
-global['infiscroll'] = infiscroll;
+/**
+ * Functions that need jquery
+ * setToast
+ * toggleButton
+ * Infinite Scroll
+ * makeAjaxRequest
+ * createDataTable
+ * addAjax
+ * editAjax
+ * deleteRestore
+ * setEditData
+ * handleAjaxErrorResponse if toast is truthy
+ *
+ * Functions that need bootstrap
+ * setToast
+ * deleteRestore
+ * handleAjaxErrorResponse if toast is truthy
+ *
+ * Functions that depend on data tables
+ * createDataTable
+ * addAjax if dataTable is truthy
+ * editAjax if dataTable is truthy
+ * deleteRestore if table is truthy
+ */
+module.exports = Infiscroll;
+global['Infiscroll'] = Infiscroll;
