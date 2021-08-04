@@ -1,7 +1,7 @@
 <p align="center"><img alt="Logo" src="https://res.cloudinary.com/dkgtd3pil/image/upload/e_bgremoval,o_100/v1587389258/other_data/Screenshot_21.png"></p>
 <p align="center">
 <a href="https://npmjs.com/package/@dopesky/infiscroll"><img alt="npm (scoped)" src="https://img.shields.io/npm/v/@dopesky/infiscroll?logo=npm"></a>
-<a href="https://github.com/dopesky/infiscroll/actions?query=workflow%3Abuild"><img src="https://github.com/dopesky/infiscroll/workflows/build/badge.svg?branch=1.0.2" alt="Build Status"></a>
+<a href="https://github.com/dopesky/infiscroll/actions?query=workflow%3Abuild"><img src="https://github.com/dopesky/infiscroll/workflows/build/badge.svg?branch=2.0.0" alt="Build Status"></a>
 <a href='https://coveralls.io/github/dopesky/infiscroll?branch=master'><img src='https://coveralls.io/repos/github/dopesky/infiscroll/badge.svg' alt='Coverage Status' /></a>
 <a href="https://github.com/dopesky/infiscroll/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/dopesky/infiscroll"></a>
 <a href="https://github.com/dopesky/infiscroll/blob/master/LICENSE"><img src="https://img.shields.io/github/license/dopesky/infiscroll" alt="License"></a>
@@ -29,9 +29,9 @@ Infiscroll is a class containing utility functions that enable you to:
 
 Include the following in your html after JQuery, Bootstrap and DataTables CSS and JS files:
 ```
-https://unpkg.com/@dopesky/infiscroll@1.0.2/dist/css/infiscroll.css
+https://unpkg.com/@dopesky/infiscroll@2.0.0/dist/css/infiscroll.css
 
-https://unpkg.com/@dopesky/infiscroll@1.0.2/dist/js/infiscroll.js
+https://unpkg.com/@dopesky/infiscroll@2.0.0/dist/js/infiscroll.js
 ```
 
 **Note:** The product is currently on [Node Package Registry](https://npmjs.com/@dopesky/infiscroll) and [GitHub Package Registry](https://github.com/dopesky/infiscroll/packages/228073). Therefore, you can also install the whole project by running: 

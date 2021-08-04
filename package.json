@@ -1,6 +1,6 @@
 {
   "name": "@dopesky/infiscroll",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "An Infinite Scroll Helper Complete with image lazy load, show on scroll animation, ajax helpers, toasts and more!",
   "main": "src/js/infiscroll.js",
   "directories": {
