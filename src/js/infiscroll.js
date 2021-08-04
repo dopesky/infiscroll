@@ -2,8 +2,6 @@ require('@babel/polyfill');
 // TODO: Support Inline Error Messages in Forms
 // TODO: Add Support for Laravel Livewire
 // TODO: Support Show confirmation modal in delete/restore and support unrestorable deletions
-// TODO: Scroll to TOP after Insert and Scroll to Datatable after Edit
-// TODO: Scroll to TOP after cancel-button is pressed
 class Infiscroll {
     constructor(options = {}) {
         this.validToastTypes = options.validToastTypes || {
@@ -81,7 +79,7 @@ class Infiscroll {
         this.setEditDataPreProcess = options.setEditDataPreProcess || (() => true);
         this.setEditDataPostProcess = options.setEditDataPostProcess || (() => true);
         this.pageTitlesSelector = options.pageTitlesSelector || '.page-title';
-        this.buttonDiv = $(options.buttonDiv || '#button-div');
+        this.buttonDiv =options.buttonDiv || '#button-div';
         this.formErrorContainer = options.formErrorContainer || null;
         this.scrollToTopElement = options.scrollToTopElement || 'body, html';
     }
@@ -219,7 +217,7 @@ class Infiscroll {
             $('#show-more').children().on('click', (event) => {
                 this.afterInfiniteScrollAjax(event.target).then(() => {
                     $('body, html').animate({scrollTop: 0}, () => {
-                        document.getElementById('show-more').classList.add('d-none');
+                        $(event.currentTarget).addClass('d-none');
                     });
                 });
             });
@@ -378,6 +376,7 @@ class Infiscroll {
             if (this.pageState === 'edit') this.toggleButton({button, html: $(this.buttonHtmlEdit).html()});
         }
         if (this.pageState === 'add') this.toggleButton({button, html: $(this.buttonHtmlAdd).html()});
+        $(dataTable || this.scrollToTopElement).animate({scrollTop: 0});
         return returnValue;
     }
 
@@ -427,8 +426,8 @@ class Infiscroll {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.edit;
             });
-            this.buttonDiv.html(this.buttonHtmlEdit);
-            this.buttonDiv.append(this.buttonHtmlCancel || (() => {
+            $(this.buttonDiv).html(this.buttonHtmlEdit);
+            $(this.buttonDiv).append(this.buttonHtmlCancel || (() => {
                 let button = document.createElement('button');
                 button.className += "btn btn-danger btn-sm";
                 button.type = "button";
@@ -447,14 +446,14 @@ class Infiscroll {
                     for (let i = 0; i < checkboxes.length; i++) checkboxes[i].checked = checkboxes[i].value === data[item];
                 }
             }
-            if (scrollToTop) $(this.scrollToTopElement).animate({scrollTop: 0});
         } else {
             pageTitles.forEach(function (value) {
                 value.innerHTML = value.dataset.add;
             });
-            this.buttonDiv.html(this.buttonHtmlAdd);
+            $(this.buttonDiv).html(this.buttonHtmlAdd);
             this.resetForm({form});
         }
+        if (scrollToTop) $(this.scrollToTopElement).animate({scrollTop: 0});
         this.setEditDataPostProcess(data, this.pageState);
         return this.pageState;
     }

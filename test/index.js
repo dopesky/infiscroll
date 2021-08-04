@@ -1,6 +1,7 @@
 const {describe, it, before} = require("mocha");
 const chai = require('chai');
 const should = chai.should();
+const expect = chai.expect;
 let isIntersecting = true;
 prepareEnvironmentForTesting();
 const Infiscroll = require('../src/js/infiscroll');
@@ -160,7 +161,7 @@ describe('Variable Testing', () => {
 })
 
 describe('Function Testing', () => {
-    before('Prepare DOM for Testing', () => {
+    beforeEach('Prepare DOM for Testing', () => {
         global['dom'] = new jsdom.JSDOM(`<!DOCTYPE html><html lang="en"><head><title>Test DOM</title></head><body></body></html>`, {
             runScripts: "dangerously",
             resources: "usable"
@@ -168,6 +169,7 @@ describe('Function Testing', () => {
         global['$'] = require('jquery')(dom.window);
         global['window'] = dom.window;
         global['document'] = window.document;
+        global.window['moment'] = require('moment');
         global['navigator'] = {language: 'en'};
         global['FormData'] = class FormData {
             constructor(form) {
@@ -231,11 +233,8 @@ describe('Function Testing', () => {
     })
 
     describe('Cancel Update Button', () => {
-        it("Should be a Function that returns a HtmlElement", () => {
-            (typeof infiscroll.buttonHtmlCancel).should.be.equal('function');
-            infiscroll.buttonHtmlCancel().type.should.be.equal('button');
-            infiscroll.buttonHtmlCancel().innerText.should.be.equal('Cancel');
-            infiscroll.buttonHtmlCancel().click();
+        it("Should be Undefined", () => {
+            expect(infiscroll.buttonHtmlCancel).to.be.undefined;
         })
     })
 
@@ -251,6 +250,16 @@ describe('Function Testing', () => {
             infiscroll.setToast([]).should.equal(false);
             infiscroll.setToast({type: 'error'}).should.equal(false);
         })
+
+        it('Should Return False if JQuery is not Set', () => {
+            global.window.jQuery = null;
+            infiscroll.setToast({type: 'danger'}).should.equal(false)
+        })
+
+        it('Should Return False if Bootstrap is not Set', () => {
+            $.fn.toast = null;
+            infiscroll.setToast({type: 'danger'}).should.equal(false)
+        })
     })
 
     describe('Toggle Button Function', () => {
@@ -264,6 +273,11 @@ describe('Function Testing', () => {
             should.throw(() => infiscroll.toggleButton(), TypeError);
             infiscroll.toggleButton({}).should.equal(false);
             infiscroll.toggleButton([]).should.equal(false);
+        })
+
+        it('Should Return False if JQuery is not Set', () => {
+            global.window.jQuery = null;
+            infiscroll.toggleButton({button: '#test-toggle-button'}).should.equal(false);
         })
     })
 
@@ -343,14 +357,19 @@ describe('Function Testing', () => {
         })
     })
 
-    describe('Get Timezone Equivalent Date Function', () => {
+    describe('Get Client Time from Server Time Function', () => {
+        it('Should Return false if Moment is not available', () => {
+            global.window.moment = null;
+            infiscroll.getClientTimeFromServerTime('now').should.be.equal(false);
+        })
+
         it('Should Transform Timezone Date to Local Equivalent Datetime', () => {
-            infiscroll.getTimezoneEquivalentDate('2020-05-13 12:00:00', 0)
+            infiscroll.getClientTimeFromServerTime('2020-05-13 12:00:00', 0)
                 .add((new Date()).getTimezoneOffset(), 'minutes').format('hh:mm:ss').should.be.equal('12:00:00');
         })
 
         it('Should reject Invalid dates', () => {
-            infiscroll.getTimezoneEquivalentDate('2020-12-34').should.be.equal(false);
+            infiscroll.getClientTimeFromServerTime('2020-12-34').should.be.equal(false);
         })
     })
 
@@ -393,6 +412,7 @@ describe('Function Testing', () => {
                 return {newItems: 200, hasMoreItems: false, offset: 20, size: 200};
             }, '.show-on-scroll').should.be.equal(true);
             isIntersecting = true;
+            $('#show-more').children().trigger('click');
         })
 
         it('Should Return False if Wrong Url is Passed or no Targets are found', () => {
@@ -400,8 +420,9 @@ describe('Function Testing', () => {
             infiscroll.initInfiniteScroll('https://jsonplaceholder.typicode.com/posts', (data) => data, '.not-in-dom').should.be.equal(false);
         })
 
-        it('Should Load New Items', () => {
-            $('#show-more').children().trigger('click');
+        it('Should Return False if JQuery is not Set', () => {
+            global.window.jQuery = null;
+            infiscroll.initInfiniteScroll().should.equal(false);
         })
     })
 
@@ -412,21 +433,29 @@ describe('Function Testing', () => {
             infiscroll.createDataTable({deletableRecords: false}).should.be.equal(true);
             infiscroll.createDataTable({deleteMarker: 'none'}).should.be.equal(true);
         })
+
+        it('Should Return False if JQuery is not Set', () => {
+            global.window.jQuery = null;
+            infiscroll.createDataTable({ajax: {}, isServerSide: true, processing: true}).should.be.equal(false);
+        })
+
+        it('Should Return False if Datatables is not Set', () => {
+            $.fn.dataTable = null
+            infiscroll.createDataTable({ajax: {}, isServerSide: true, processing: true}).should.be.equal(false);
+        })
     })
 
-    describe('Register Via Ajax Function', () => {
+    describe('Register/Edit Via Ajax Function', () => {
         it('Should Submit Forms to the Backend', (done) => {
-            infiscroll.addAjax({hasImages: true}).then(data => {
+            infiscroll.addEditAjax({}).then(data => {
                 data.should.be.eql({ok: '1', error: ''});
                 done();
             })
         })
-    })
-
-    describe('Edit Via Ajax Function', () => {
-        it('Should Submit Forms to the Backend', (done) => {
-            infiscroll.editAjax({}).then(data => {
-                data.should.be.eql({ok: '1', error: ''});
+        it('Should Return False if JQuery is not Set', (done) => {
+            global.window.jQuery = null;
+            infiscroll.addEditAjax({}).then(data => {
+                data.should.equal(false)
                 done();
             })
         })
@@ -470,15 +499,34 @@ describe('Function Testing', () => {
                 done();
             });
         })
+
+        it('Should Return False if JQuery is not Set', (done) => {
+            global.window.jQuery = null;
+            infiscroll.deleteRestore({
+                button: '#test-toggle-button',
+                id: infiscroll.stringify({ok: 1}),
+                suspend: true,
+                url: '',
+                table: 'table'
+            }).then(data => {
+                data.should.equal(false)
+                done();
+            })
+        })
     })
 
     describe('Set Edit Data to Form Function', () => {
         it('Should Set the Data Successfully', () => {
-            infiscroll.setEditData({ok: 0, error: 'Kevin is Awesome.'}).should.be.equal('edit');
+            infiscroll.setEditData({data: {ok: 0, error: 'Kevin is Awesome.'}}).should.be.equal('edit');
         })
 
         it('Should Restore the Form Successfully', () => {
             infiscroll.setEditData().should.be.equal('add');
+        })
+
+        it('Should Return False if JQuery is not Set', () => {
+            global.window.jQuery = null;
+            infiscroll.setEditData({data: {ok: 0, error: 'Kevin is Awesome.'}}).should.be.equal(false);
         })
     })
 
