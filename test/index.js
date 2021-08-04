@@ -186,9 +186,7 @@ describe('Function Testing', () => {
         body.append("<img src='https://source.unsplash.com/random' alt='Dummy' class='lazy-load-image' data-src='https://source.unsplash.com/random' data-srcset='elva-fairy-480w.jpg 480w, elva-fairy-800w.jpg 800w'>");
         body.append("<div class='lazy-load' data-src='https://source.unsplash.com/random'></div>");
         body.append("<div id='form-errors-container'><div id='form-errors'></div></div>");
-        $.fn.toast = () => {
-            return true;
-        };
+        $.fn.toast = () => true;
         $.fn.DataTable = (options) => {
             let full = {
                 id: 1,

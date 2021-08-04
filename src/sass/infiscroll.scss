@@ -18,12 +18,12 @@ $purple: #9c27b0;
 }
 
 @mixin defineBgAndTextColors($name, $color, $color-on-bg: whitesmoke) {
-  .bg-#{$name} {
+  .bg-#{"" + $name} {
     background: $color;
     color: $color-on-bg;
   }
 
-  a.bg-#{$name}, button.bg-#{$name} {
+  a.bg-#{"" + $name}, button.bg-#{"" + $name} {
     border-color: $color;
 
     &:hover {
@@ -33,11 +33,11 @@ $purple: #9c27b0;
     }
   }
 
-  .text-#{$name} {
+  .text-#{"" + $name} {
     color: darken($color, 10%);
   }
 
-  a.text-#{$name}, button.text-#{$name} {
+  a.text-#{"" + $name}, button.text-#{"" + $name} {
     &:hover {
       color: darken($color, 20%);
     }
@@ -45,7 +45,7 @@ $purple: #9c27b0;
 }
 
 @mixin defineTheadColors($name, $bg-color, $color) {
-  thead.thead-#{$name} {
+  thead.thead-#{"" + $name} {
     background: $bg-color;
     color: $color;
 
@@ -308,7 +308,7 @@ button, a, input, #show-more * {
   color: darken(whitesmoke, 1%);
 }
 
-.d-none {
+.d-none.force {
   display: none !important;
 }
 

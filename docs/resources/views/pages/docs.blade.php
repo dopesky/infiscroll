@@ -226,6 +226,16 @@
                                     {!! returnType('boolean') !!}
                                 </h6>
                                 <hr>
+                                <div>
+                                    Call this Function in order to Initialize Reveal Animations on a page.
+                                    This means that an animation will play on an object every time the element is
+                                    visible on screen. Pass an optional element selector that will be used to tell the
+                                    function which elements will be animated when the page is scrolled to them. It uses
+                                    the <em>revealOnScrollObserver</em> described below to know whether the element to
+                                    be animated is in view of the user (i.e it is intersecting with the window). Returns
+                                    true if scroll animation was initialized successfully on at least 1 element with the
+                                    supplied selector.
+                                </div>
                             </div>
                             <div class="font-sm border rounded p-2 bg-light my-2">
                                 <h6 class="font-sm">
@@ -236,6 +246,21 @@
                                     <span class="badge text-light badge-dark">overridable in constructor</span>
                                 </div>
                                 <hr>
+                                <hr>
+                                <div>
+                                    This IntersectionObserver is only used to check if a scroll reveal element is in
+                                    view so that its reveal can be animated. The animation applied is dependent on the
+                                    selector passed to the above init function. The observer appends the
+                                    <em>is-visible</em> class to the selector element whenever it comes into view and
+                                    removes it when it goes away. Animations are applied via CSS for when the elements
+                                    have the <em>is-infinite</em> class and when they do not. Infiscroll provides a
+                                    sweet default animation for this that is on show in the <a href="{{route('home')}}">scroll</a>
+                                    page of this docs. By default, reveal animations are infinitely looping. This means
+                                    they will happen each and every time an element is intersecting with the visible
+                                    window. To apply reveal animations only once, add a <em>data-infinite</em> attribute
+                                    to all relevant elements with a truthy value. This will cause this observer to
+                                    unobserve itself after the first reveal occurrence.
+                                </div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="ajax">
@@ -629,3 +654,7 @@
         </div>
     </main>
 @endsection
+@push('page-script')
+    <script>
+    </script>
+@endpush

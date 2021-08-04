@@ -1,6 +1,9 @@
 require('@babel/polyfill');
 // TODO: Support Inline Error Messages in Forms
 // TODO: Add Support for Laravel Livewire
+// TODO: Support Show confirmation modal in delete/restore and support unrestorable deletions
+// TODO: Scroll to TOP after Insert and Scroll to Datatable after Edit
+// TODO: Scroll to TOP after cancel-button is pressed
 class Infiscroll {
     constructor(options = {}) {
         this.validToastTypes = options.validToastTypes || {
@@ -257,8 +260,8 @@ class Infiscroll {
             return false;
         }
         if (isCrud && ajax) ajax.dataSrc = ajax.dataSrc || ((data) => data);
-        $.fn.dataTable.Buttons.defaults.buttons = [];
-        $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons d-flex justify-content-md-end ml-2 flex-wrap';
+        if ($.fn.dataTable.Buttons) $.fn.dataTable.Buttons.defaults.buttons = [];
+        if ($.fn.dataTable.Buttons) $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons d-flex justify-content-md-end ml-2 flex-wrap';
         $.fn.dataTable.ext.classes.sFilter = 'dataTables_filter d-flex align-items-center';
         $.fn.dataTable.ext.classes.sPageButton = 'page-item dataTables-pagination-list-item';
         $.fn.dataTable.ext.classes.sProcessing = "dataTables_processing card";
@@ -293,7 +296,6 @@ class Infiscroll {
                         searchable: false,
                         class: 'text-center',
                         render: (data, type, full) => {
-                            if (!full.hasOwnProperty(deleteMarker)) return data;
                             const restoreButton = `<button data-id="${data}" data-suspend="0" class='btn btn-sm btn-success delete-restore-button' 
                                title='Restore'>${this.dataTableRestoreButton}</button>`;
                             const deleteButton = `<button data-id="${data}" data-suspend="1" class='btn btn-sm btn-danger delete-restore-button' 
@@ -302,7 +304,7 @@ class Infiscroll {
                             return `<div class='d-flex align-items-center
                                 justify-content-${deletableRecords && editableRecords ? 'around' : 'center'}'>
                                 ${editableRecords && (!full.hasOwnProperty('editable') || full.editable) ? editButton : this.dataTableNonEditableHtml}
-                                ${deletableRecords && (!full.hasOwnProperty('deletable') || full.deletable) ? (full[deleteMarker] ? restoreButton : deleteButton) : this.dataTableNonDeletableHtml}</div>`;
+                                ${deletableRecords && (!full.hasOwnProperty('deletable') || full.deletable) ? (!full.hasOwnProperty(deleteMarker) ? data : (full[deleteMarker] ? restoreButton : deleteButton)) : this.dataTableNonDeletableHtml}</div>`;
                         },
                     })
                 }
@@ -359,7 +361,7 @@ class Infiscroll {
                 });
                 this.setFormErrors();
                 if (dataTable) dataTable.ajax.reload();
-                if (this.pageState === 'add' && resetForm) form[0].reset();
+                if (this.pageState === 'add' && resetForm) this.resetForm({form});
                 if (this.pageState === 'edit' && resetForm) this.setEditData({form});
                 if (this.pageState === 'edit' && !resetForm) this.toggleButton({
                     button,
@@ -451,10 +453,21 @@ class Infiscroll {
                 value.innerHTML = value.dataset.add;
             });
             this.buttonDiv.html(this.buttonHtmlAdd);
-            form[0].reset();
+            this.resetForm({form});
         }
         this.setEditDataPostProcess(data, this.pageState);
         return this.pageState;
+    }
+
+    resetForm({form = '#form'} = {}) {
+        if (!window.jQuery) {
+            console.error('JQuery is Required for resetForm function to Work!');
+            return false;
+        }
+        form = $(form);
+        form[0].reset();
+        form.find('select,input,textarea').trigger('change');
+        return true;
     }
 
     handleAjaxErrorResponse(response, toast = false, logErrors = true) {
