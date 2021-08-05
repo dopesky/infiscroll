@@ -1,8 +1,7 @@
 const {parallel, src, task, dest, watch} = require('gulp');
 const browserSync = require('browser-sync').create(); // browser hot reload
 
-const sass = require('gulp-sass'); // sass compiler and minifier
-sass.compiler = require('node-sass'); // set the compiler for gulp-sass explicitly as advised in docs
+const sass = require('gulp-sass')(require('node-sass')); // sass compiler and minifier
 
 const browserify = require('browserify'); // convert my module syntax to browser readable
 const babelify = require('babelify'); // Use babel to transform my js to es2015
